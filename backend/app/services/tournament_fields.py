@@ -15,7 +15,8 @@ from app.services.elo import EloEngine
 from app.services.simulator import TeamState
 
 ROOT = Path(__file__).resolve().parents[3]
-MATCHES_PATH = ROOT / "data" / "processed" / "matches_2010_plus.csv"
+MATCHES_PATH = ROOT / "data" / "processed" / "matches_2020_plus.csv"
+DECISION_START = "2020-01-01"
 
 # Approximate confederation map for demo teams
 CONFED = {
@@ -188,22 +189,25 @@ _ELO_CACHE: dict[str, dict[str, float]] = {}
 
 
 def _load_elo_map(as_of: str) -> dict[str, float]:
+    """Fit Elo on 2020+ internationals strictly before ``as_of``.
+
+    Cold-starts at 1500. Hand-written PRIOR_ELO is *not* blended into decisions
+    so pre-2020 judgment does not leak into the rating used by the simulator.
+    """
     if as_of in _ELO_CACHE:
         return _ELO_CACHE[as_of]
     if not MATCHES_PATH.exists():
-        _ELO_CACHE[as_of] = dict(PRIOR_ELO)
+        _ELO_CACHE[as_of] = {}
         return _ELO_CACHE[as_of]
     df = pd.read_csv(MATCHES_PATH)
-    df = df[df["match_date"] < as_of]
+    df = df[(df["match_date"] >= DECISION_START) & (df["match_date"] < as_of)]
     if df.empty:
-        _ELO_CACHE[as_of] = dict(PRIOR_ELO)
+        _ELO_CACHE[as_of] = {}
         return _ELO_CACHE[as_of]
     engine = EloEngine()
     engine.fit(df)
-    ratings = dict(PRIOR_ELO)
-    ratings.update(engine.state.ratings)
-    _ELO_CACHE[as_of] = ratings
-    return ratings
+    _ELO_CACHE[as_of] = dict(engine.state.ratings)
+    return _ELO_CACHE[as_of]
 
 
 def _groups_to_team_states(
@@ -214,7 +218,7 @@ def _groups_to_team_states(
         out[gname] = [
             TeamState(
                 team_id=name,
-                elo=float(elo_map.get(name, PRIOR_ELO.get(name, 1500.0))),
+                elo=float(elo_map.get(name, 1500.0)),
                 confederation=CONFED.get(name),
                 group=gname,
             )

@@ -14,7 +14,7 @@ from typing import Any
 import numpy as np
 
 from app.services.poisson_model import PoissonMatchModel
-from app.services.tournament_fields import PRIOR_ELO, _load_elo_map
+from app.services.tournament_fields import _load_elo_map
 from app.services.simulator import TeamState
 
 
@@ -50,7 +50,7 @@ class SemiPreview:
 def _team(name: str, elo_map: dict[str, float]) -> TeamState:
     return TeamState(
         team_id=name,
-        elo=float(elo_map.get(name, PRIOR_ELO.get(name, 1500.0))),
+        elo=float(elo_map.get(name, 1500.0)),
     )
 
 

@@ -18,4 +18,6 @@ Still open (higher effort / documented intentionally)
 4. **Host advantage in tournament sims** — still forced neutral for now.
 5. **Calibrated Poisson params / form features** — defaults remain for v1 demos.
 6. **Cached `simulation_results` serve path** — demo API still runs small live N.
+7. **External EloRatings snapshot** is ingested as a comparator; primary strength
+   is still in-repo Elo fit on **2020+** internationals only.
 """

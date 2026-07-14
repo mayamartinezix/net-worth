@@ -1,88 +1,62 @@
 # Data layout
 
-Where historical inputs live for Elo fitting, Poisson calibration, backtests, and market baselines.
+Where historical inputs live for Elo fitting, backtests, and market baselines.
+
+## Decision window (important)
+
+**Live model decisions use internationals from `2020-01-01` onward only.**
+
+| File | Role |
+|------|------|
+| `data/processed/matches_2020_plus.csv` | **Elo fitting / simulator strength** |
+| `data/processed/matches_2010_plus.csv` | Legacy slice for experiments only |
+| `data/processed/matches_all.csv` | Full archive (not used for live Elo) |
+
+Elo cold-starts at 1500 and is fit sequentially on the 2020+ window up to each event’s as-of date. Hand-written prior Elos are **not** blended into decisions.
 
 ## Directory map
 
 ```
 data/
-  raw/                         # Upstream dumps (re-downloadable)
-    results.csv                # martj42 international results (CC0)
-    shootouts.csv              # Penalty shootout winners
-    fifa_ranking_historical.csv
-  processed/                   # Normalized for our models
-    matches_all.csv
+  raw/
+    results.csv                    # martj42 internationals
+    shootouts.csv
+    fifa_ranking_historical.csv    # Dato-Futbol FIFA rankings
+    fifa_ranking_cnc8_2020.csv     # alternate FIFA ranking schema snapshot
+    eloratings_world.tsv           # World Football Elo Ratings (live snapshot)
+    eloratings_en_teams.tsv        # country code → name map
+    wc2026_openfootball_*.json     # openfootball WC 2026 structure
+  processed/
+    matches_2020_plus.csv          # ★ decision window
     matches_2010_plus.csv
-    matches_wc_2018.csv
-    matches_wc_2022.csv
-    matches_wc_2026.csv
-    matches_euro_2016.csv
-    matches_euro_2020.csv      # staged in 2021
-    matches_euro_2024.csv
+    matches_all.csv
+    matches_wc_*.csv / matches_euro_*.csv
     fifa_rankings.csv
+    fifa_rankings_2020_plus.csv
+    fifa_rankings_cnc8_snapshot.csv
+    eloratings_world_snapshot.csv  # external comparator (not primary Elo)
     shootouts.csv
     manifest.json
-  odds/                        # Market baseline (you may add Euros here)
-    WorldCup2026.xlsx          # Source workbook from football-data.co.uk
-    wc_2018_odds.csv           # Auto-exported
-    wc_2022_odds.csv
-    wc_2026_odds.csv
-    wc_2014_odds.csv
-    euro_*_odds.csv            # ← DROP UEFA Euro odds HERE (not auto-fetched)
-  sample/                      # Tiny fixtures for unit tests only
+  odds/
+    wc_*_odds.csv                  # football-data.co.uk
+    euro_*_odds.csv                # optional drop zone
 ```
 
-## What this agent already gathered
+## Sources gathered
 
-| Dataset | Status | Source |
-|---------|--------|--------|
-| All internationals (results) | ✅ in `data/raw/results.csv` | [martj42/international_results](https://github.com/martj42/international_results) |
-| Shootouts | ✅ | same |
-| FIFA rankings 1992–2024 | ✅ | [Dato-Futbol/fifa-ranking](https://github.com/Dato-Futbol/fifa-ranking) |
-| World Cup odds 2014/2018/2022 | ✅ | [football-data.co.uk](https://www.football-data.co.uk/WorldCup2026.xlsx) |
-| UEFA Euro odds 2016/2020/2024 | ❌ not freely bulk-downloadable in the same workbook | **you drop CSVs** |
+| Source | Status | Used for decisions? |
+|--------|--------|---------------------|
+| martj42 international results | ✅ | Yes (2020+ only) |
+| World Football Elo Ratings (eloratings.net) | ✅ snapshot | Comparator / research, not primary |
+| FIFA rankings (Dato-Futbol) | ✅ + 2020+ filter | Baseline validation |
+| FIFA rankings (cnc8 snapshot) | ✅ | Alternate schema / research |
+| football-data.co.uk WC odds | ✅ | Market baseline |
+| openfootball WC 2026 JSON | ✅ | Groups / teams / venues reference |
+| ClubElo API | available (`api.clubelo.com`) | Clubs only — not used for national-team decisions |
+| UEFA Euro odds | ❌ drop into `data/odds/` | Optional |
 
-Refresh / rebuild processed slices:
+Refresh:
 
 ```bash
 PYTHONPATH=backend python backend/scripts/ingest_public_data.py
-# or, if raw files already present:
-PYTHONPATH=backend python backend/scripts/ingest_public_data.py --skip-download
 ```
-
-## What you should add (only if you want market baselines for Euros)
-
-Put files in **`data/odds/`**:
-
-- `euro_2016_odds.csv`
-- `euro_2020_odds.csv`
-- `euro_2024_odds.csv`
-
-Minimum columns:
-
-```text
-match_date,home_team,away_team,odds_home_avg,odds_draw_avg,odds_away_avg
-```
-
-Use **decimal** odds. Team names should match `data/processed/matches_euro_*.csv` (`home_team_id` / `away_team_id`), e.g. `France`, `England`, `Czech Republic` (not `CZE`).
-
-Practical sources to export from:
-- OddsPortal / Footiqo (manual CSV export per tournament)
-- Any historical odds archive you already have
-
-World Cup market comparison does **not** need extra files — `wc_2018_odds.csv` and `wc_2022_odds.csv` are enough.
-
-## Match schema used by Elo / Poisson
-
-Processed match files use:
-
-```text
-match_date,home_team_id,away_team_id,home_goals,away_goals,
-tournament,city,country,is_neutral_venue,is_friendly
-```
-
-## Notes
-
-- Euro 2020 matches are labeled year **2021** in the raw file (COVID delay); ingest maps them to `euro_2020`.
-- Raw `results.csv` is large (~50k rows). Prefer `matches_2010_plus.csv` for day-to-day Elo fits.
-- Do not hand-edit `raw/`; re-run ingest after dropping new odds files if you extend the exporter.

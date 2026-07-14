@@ -145,6 +145,16 @@ def test_final_four_compare():
         assert t["p_champion"] <= t["p_final"] + 1e-12
 
 
+def test_elo_decision_window_is_2020_plus():
+    from app.services.tournament_fields import DECISION_START, MATCHES_PATH, _load_elo_map
+
+    assert DECISION_START == "2020-01-01"
+    assert MATCHES_PATH.name == "matches_2020_plus.csv"
+    if MATCHES_PATH.exists():
+        elo = _load_elo_map("2024-06-14")
+        assert len(elo) > 20
+
+
 def test_dixon_coles_toggle():
     m1 = PoissonMatchModel(PoissonModelConfig(use_dixon_coles=False))
     m2 = PoissonMatchModel(PoissonModelConfig(use_dixon_coles=True, dixon_coles_rho=-0.1))

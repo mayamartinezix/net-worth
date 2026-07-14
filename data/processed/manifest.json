@@ -1,56 +1,60 @@
-[
-  {
-    "slug": "wc_2018",
-    "competition": "FIFA World Cup",
-    "year": 2018,
-    "n_matches": 64,
-    "path": "data/processed/matches_wc_2018.csv",
-    "date_min": "2018-06-14",
-    "date_max": "2018-07-15"
-  },
-  {
-    "slug": "wc_2022",
-    "competition": "FIFA World Cup",
-    "year": 2022,
-    "n_matches": 64,
-    "path": "data/processed/matches_wc_2022.csv",
-    "date_min": "2022-11-20",
-    "date_max": "2022-12-18"
-  },
-  {
-    "slug": "wc_2026",
-    "competition": "FIFA World Cup",
-    "year": 2026,
-    "n_matches": 100,
-    "path": "data/processed/matches_wc_2026.csv",
-    "date_min": "2026-06-11",
-    "date_max": "2026-07-11"
-  },
-  {
-    "slug": "euro_2016",
-    "competition": "UEFA Euro",
-    "year": 2016,
-    "n_matches": 51,
-    "path": "data/processed/matches_euro_2016.csv",
-    "date_min": "2016-06-10",
-    "date_max": "2016-07-10"
-  },
-  {
-    "slug": "euro_2020",
-    "competition": "UEFA Euro",
-    "year": 2020,
-    "n_matches": 51,
-    "path": "data/processed/matches_euro_2020.csv",
-    "date_min": "2021-06-11",
-    "date_max": "2021-07-11"
-  },
-  {
-    "slug": "euro_2024",
-    "competition": "UEFA Euro",
-    "year": 2024,
-    "n_matches": 51,
-    "path": "data/processed/matches_euro_2024.csv",
-    "date_min": "2024-06-14",
-    "date_max": "2024-07-14"
-  }
-]
+{
+  "decision_start": "2020-01-01",
+  "decision_matches": "data/processed/matches_2020_plus.csv",
+  "editions": [
+    {
+      "slug": "wc_2018",
+      "competition": "FIFA World Cup",
+      "year": 2018,
+      "n_matches": 64,
+      "path": "data/processed/matches_wc_2018.csv",
+      "date_min": "2018-06-14",
+      "date_max": "2018-07-15"
+    },
+    {
+      "slug": "wc_2022",
+      "competition": "FIFA World Cup",
+      "year": 2022,
+      "n_matches": 64,
+      "path": "data/processed/matches_wc_2022.csv",
+      "date_min": "2022-11-20",
+      "date_max": "2022-12-18"
+    },
+    {
+      "slug": "wc_2026",
+      "competition": "FIFA World Cup",
+      "year": 2026,
+      "n_matches": 100,
+      "path": "data/processed/matches_wc_2026.csv",
+      "date_min": "2026-06-11",
+      "date_max": "2026-07-11"
+    },
+    {
+      "slug": "euro_2016",
+      "competition": "UEFA Euro",
+      "year": 2016,
+      "n_matches": 51,
+      "path": "data/processed/matches_euro_2016.csv",
+      "date_min": "2016-06-10",
+      "date_max": "2016-07-10"
+    },
+    {
+      "slug": "euro_2020",
+      "competition": "UEFA Euro",
+      "year": 2020,
+      "n_matches": 51,
+      "path": "data/processed/matches_euro_2020.csv",
+      "date_min": "2021-06-11",
+      "date_max": "2021-07-11"
+    },
+    {
+      "slug": "euro_2024",
+      "competition": "UEFA Euro",
+      "year": 2024,
+      "n_matches": 51,
+      "path": "data/processed/matches_euro_2024.csv",
+      "date_min": "2024-06-14",
+      "date_max": "2024-07-14"
+    }
+  ]
+}

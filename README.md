@@ -142,8 +142,9 @@ PYTHONPATH=backend uvicorn app.main:app --app-dir backend --host 0.0.0.0 --port 
 
 ## Data (historical results, rankings, odds)
 
+**Decision window: 2020-01-01 onward** for Elo used in live simulations (`matches_2020_plus.csv`).
 
-Public datasets are already pulled into `data/`. See **[docs/DATA.md](docs/DATA.md)** for the layout.
+Public datasets live under `data/`. See **[docs/DATA.md](docs/DATA.md)**.
 
 ```bash
 PYTHONPATH=backend python backend/scripts/ingest_public_data.py
@@ -151,10 +152,12 @@ PYTHONPATH=backend python backend/scripts/ingest_public_data.py
 
 | Input | Status |
 |-------|--------|
-| International results (WC + Euros editions) | ✅ gathered incl. **WC 2026** (`matches_wc_2026.csv`) |
-| FIFA ranking history | ✅ gathered |
-| World Cup odds (2014/2018/2022/**2026**) | ✅ gathered |
-| UEFA Euro odds | ❌ drop CSVs in `data/odds/euro_*_odds.csv` if you want market baselines for Euros |
+| Internationals for Elo (**2020+**) | ✅ |
+| EloRatings.net national snapshot | ✅ (comparator) |
+| FIFA rankings (+ 2020+ filter) | ✅ |
+| openfootball WC 2026 structure | ✅ |
+| World Cup odds incl. 2026 | ✅ |
+| UEFA Euro odds | ❌ optional drop-in |
 
 ## Build order (status)
 
