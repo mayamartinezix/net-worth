@@ -73,113 +73,76 @@ export default function App() {
 
   return (
     <div className="page">
-      <header className="top">
-        <div className="top-inner">
-          <p className="brand">PitchPath</p>
-          <h1>Tournament odds, simply.</h1>
-          <p className="lede">
-            Monte Carlo paths for World Cup and Euros — round-reached and title probabilities.
-          </p>
+      <header className="hero">
+        <p className="brand">PitchPath</p>
+        <p className="lede">Tournament odds from Monte Carlo paths.</p>
 
-          <div className="seg" role="tablist" aria-label="Competition">
-            {COMPETITIONS.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                role="tab"
-                aria-selected={competition === c.id}
-                className={competition === c.id ? "seg-btn active" : "seg-btn"}
-                onClick={() => setCompetition(c.id)}
-                disabled={loading}
-              >
-                {c.label}
-              </button>
-            ))}
-          </div>
+        <nav className="tabs" role="tablist" aria-label="Competition">
+          {COMPETITIONS.map((c) => (
+            <button
+              key={c.id}
+              type="button"
+              role="tab"
+              aria-selected={competition === c.id}
+              className={competition === c.id ? "tab on" : "tab"}
+              onClick={() => setCompetition(c.id)}
+              disabled={loading}
+            >
+              {c.label}
+            </button>
+          ))}
+        </nav>
 
-          <p className="status">
-            {showOdds ? odds.label : "Loading"} · N={showOdds ? odds.n_sims : "…"} · API{" "}
-            {health?.status ?? "…"}
-            {loading ? " · simulating…" : ""}
-          </p>
-        </div>
+        <p className="status">
+          {loading ? "Simulating…" : showOdds ? odds.label : "Loading"}
+          {health?.status ? ` · ${health.status}` : ""}
+        </p>
       </header>
 
       {error && <p className="error">{error}</p>}
 
       {competition === "world_cup_2026" && (
-        <section className="section" aria-labelledby="ff-heading">
-          <div className="section-head">
-            <h2 id="ff-heading">Final Four comparison</h2>
-            <button type="button" className="text-btn" onClick={loadFinalFour} disabled={ffLoading}>
+        <section className="block" aria-labelledby="ff-heading">
+          <div className="block-head">
+            <h2 id="ff-heading">Final Four</h2>
+            <button type="button" className="linkish" onClick={loadFinalFour} disabled={ffLoading}>
               Refresh
             </button>
           </div>
-          <p className="section-note">
-            Conditional on France, Spain, England, and Argentina reaching the semis. Only the
-            remaining path (2 semis + final) is simulated. <em>Squad</em> is a club-form index
-            (ClubElo of employers + league per-90 attack + market value).
-          </p>
+          <p className="hint">Semis onward only — France, Spain, England, Argentina.</p>
 
           {ffLoading && !finalFour ? (
-            <p className="placeholder">Comparing final four…</p>
+            <p className="empty">Loading…</p>
           ) : finalFour ? (
             <>
-              <div className="semi-grid">
+              <ul className="semis">
                 {finalFour.semifinals.map((s) => (
-                  <article key={`${s.home}-${s.away}`} className="semi-card">
-                    <p className="semi-date">{s.date}</p>
-                    <h3>
-                      {s.home} <span className="vs">vs</span> {s.away}
-                    </h3>
-                    <div className="advance">
-                      <div>
-                        <span className="adv-label">{s.home} advance</span>
-                        <strong>{pct(s.p_home_advance)}</strong>
-                      </div>
-                      <div>
-                        <span className="adv-label">{s.away} advance</span>
-                        <strong>{pct(s.p_away_advance)}</strong>
-                      </div>
-                    </div>
-                    <p className="meta">
-                      Elo {Math.round(s.home_elo)}–{Math.round(s.away_elo)} · λ{" "}
-                      {s.lambda_home.toFixed(2)} / {s.lambda_away.toFixed(2)} · reg. draw{" "}
-                      {pct(s.p_draw_regulation)}
-                    </p>
-                  </article>
+                  <li key={`${s.home}-${s.away}`}>
+                    <span className="semi-match">
+                      {s.home} <em>vs</em> {s.away}
+                    </span>
+                    <span className="semi-odds">
+                      {pct(s.p_home_advance)} / {pct(s.p_away_advance)}
+                    </span>
+                  </li>
                 ))}
-              </div>
+              </ul>
 
-              <div className="table-wrap tight">
+              <div className="scroll">
                 <table>
                   <thead>
                     <tr>
                       <th>Team</th>
-                      <th>Elo</th>
-                      <th>Squad</th>
-                      <th>P(Final)</th>
-                      <th>P(Champion)</th>
+                      <th>Final</th>
+                      <th>Win</th>
                     </tr>
                   </thead>
                   <tbody>
                     {finalFour.teams.map((t) => (
                       <tr key={t.team_id}>
                         <td className="team">{t.team_id}</td>
-                        <td>{Math.round(t.elo)}</td>
-                        <td>{(t.squad_index ?? 0) >= 0 ? "+" : ""}
-                          {(t.squad_index ?? 0).toFixed(2)}
-                        </td>
                         <td>{pct(t.p_final)}</td>
-                        <td className="win">
-                          <span
-                            className="win-bar"
-                            style={{ width: `${Math.max(t.p_champion * 100, 2)}%` }}
-                          />
-                          <span>
-                            {pct(t.p_champion)} ±{(t.se_champion * 100).toFixed(1)}
-                          </span>
-                        </td>
+                        <td className="win">{pct(t.p_champion)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -187,30 +150,27 @@ export default function App() {
               </div>
             </>
           ) : (
-            <p className="placeholder">Final four unavailable.</p>
+            <p className="empty">Unavailable.</p>
           )}
         </section>
       )}
 
-      <section className="section" aria-labelledby="odds-heading">
-        <div className="section-head">
-          <h2 id="odds-heading">Full-field round likelihoods</h2>
+      <section className="block" aria-labelledby="odds-heading">
+        <div className="block-head">
+          <h2 id="odds-heading">Field</h2>
           <button
             type="button"
-            className="text-btn"
+            className="linkish"
             onClick={() => runSim(competition)}
             disabled={loading}
           >
             Re-run
           </button>
         </div>
-        <p className="section-note">
-          Probabilities are cumulative “reach this round or further.” Full group stage is
-          re-simulated from kickoff (not conditioned on completed matches).
-        </p>
+        <p className="hint">Chance of reaching each round or further.</p>
 
         {showOdds && teams.length ? (
-          <div className="table-wrap">
+          <div className="scroll">
             <table>
               <thead>
                 <tr>
@@ -232,20 +192,14 @@ export default function App() {
                     <td>{pct(t.p_quarterfinal)}</td>
                     <td>{pct(t.p_semifinal)}</td>
                     <td>{pct(t.p_final)}</td>
-                    <td className="win">
-                      <span
-                        className="win-bar"
-                        style={{ width: `${Math.max(t.p_champion * 100, 1.5)}%` }}
-                      />
-                      <span>{pct(t.p_champion)}</span>
-                    </td>
+                    <td className="win">{pct(t.p_champion)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         ) : (
-          <p className="placeholder">{loading ? "Simulating…" : "No results yet."}</p>
+          <p className="empty">{loading ? "Simulating…" : "No results yet."}</p>
         )}
       </section>
 
@@ -255,7 +209,7 @@ export default function App() {
         </a>
         <span>·</span>
         <a href="https://github.com/mayamartinezix/net-worth/blob/main/docs/MODEL_VALIDATION.md">
-          Validation memo
+          Memo
         </a>
       </footer>
     </div>
