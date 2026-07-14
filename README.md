@@ -117,7 +117,25 @@ JSON format config → group RR → seeding → knockout (ET skipped; penalties 
 
 ---
 
+## Live demo
+
+While the cloud agent is running, the app is served at:
+
+**https://tuition-rank-pontiac-commerce.trycloudflare.com**
+
+- UI: `/`
+- API health: `/api/v1/health`
+- API docs: `/docs`
+
+Locally:
+
+```bash
+cd frontend && npm install && npm run build
+PYTHONPATH=backend uvicorn app.main:app --app-dir backend --host 0.0.0.0 --port 8000
+```
+
 ## Data (historical results, rankings, odds)
+
 
 Public datasets are already pulled into `data/`. See **[docs/DATA.md](docs/DATA.md)** for the layout.
 
