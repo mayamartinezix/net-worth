@@ -52,11 +52,26 @@ data/
 | FIFA rankings (cnc8 snapshot) | ✅ | Alternate schema / research |
 | football-data.co.uk WC odds | ✅ | Market baseline |
 | openfootball WC 2026 JSON | ✅ | Groups / teams / venues reference |
-| ClubElo API | available (`api.clubelo.com`) | Clubs only — not used for national-team decisions |
+| ClubElo API (`api.clubelo.com`) | ✅ | Yes — each WC player’s club Elo → squad index |
+| risingtransfers per-90 + squads | ✅ | Yes — individual club league attack stats |
+| mominullptr squad market values | ✅ | Yes — value proxy in squad index |
+| UEFA Euro player club stats | ❌ | Not yet; Euro sims stay Elo-only for squad feature |
 | UEFA Euro odds | ❌ drop into `data/odds/` | Optional |
+
+## Squad club-performance feature
+
+National Elo is complemented by a **squad_index** built from how rostered players perform at their clubs:
+
+1. Match each WC 2026 player to their club’s **ClubElo**
+2. Weight **league per-90** attack contribution (goals, assists, shots, key passes)
+3. Add log **market value** as a talent proxy
+4. Standardize within the 48-team field → `squad_index`
+5. Feed the home–away difference into Poisson λ with a small coefficient (default 0.12)
 
 Refresh:
 
 ```bash
-PYTHONPATH=backend python backend/scripts/ingest_public_data.py
+PYTHONPATH=backend python backend/scripts/ingest_player_club_data.py
 ```
+
+This is still a team-level feature (aggregated players), not a full lineups/xG game model.

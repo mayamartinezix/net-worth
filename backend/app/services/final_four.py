@@ -16,6 +16,7 @@ import numpy as np
 from app.services.poisson_model import PoissonMatchModel
 from app.services.tournament_fields import _load_elo_map
 from app.services.simulator import TeamState
+from app.services.squad_strength import squad_index_for
 
 
 # Discovered from completed QF results in data/raw (France, Spain, England, Argentina)
@@ -51,6 +52,7 @@ def _team(name: str, elo_map: dict[str, float]) -> TeamState:
     return TeamState(
         team_id=name,
         elo=float(elo_map.get(name, 1500.0)),
+        squad_index=float(squad_index_for(name)),
     )
 
 
@@ -74,7 +76,13 @@ def compare_final_four(
     semi_previews: list[SemiPreview] = []
     for semi in WC2026_FINAL_FOUR["semifinals"]:
         home, away = teams[semi["home"]], teams[semi["away"]]
-        pred = model.predict(home_elo=home.elo, away_elo=away.elo, is_neutral=True)
+        pred = model.predict(
+            home_elo=home.elo,
+            away_elo=away.elo,
+            home_squad_index=home.squad_index,
+            away_squad_index=away.squad_index,
+            is_neutral=True,
+        )
         # Knockout: regulation draw → 50/50 advance
         p_home_adv = pred.p_home + 0.5 * pred.p_draw
         p_away_adv = pred.p_away + 0.5 * pred.p_draw
@@ -115,6 +123,7 @@ def compare_final_four(
             {
                 "team_id": name,
                 "elo": t.elo,
+                "squad_index": t.squad_index,
                 "p_final": final_apps[name] / n_sims,
                 "p_champion": champ[name] / n_sims,
                 "se_champion": float(
@@ -166,7 +175,13 @@ def _play_ko(
     rng: np.random.Generator,
 ) -> str:
     score = model.sample_scorelines(
-        1, home_elo=home.elo, away_elo=away.elo, is_neutral=True, rng=rng
+        1,
+        home_elo=home.elo,
+        away_elo=away.elo,
+        home_squad_index=home.squad_index,
+        away_squad_index=away.squad_index,
+        is_neutral=True,
+        rng=rng,
     )[0]
     hg, ag = int(score[0]), int(score[1])
     if hg > ag:

@@ -13,6 +13,7 @@ import pandas as pd
 
 from app.services.elo import EloEngine
 from app.services.simulator import TeamState
+from app.services.squad_strength import squad_index_for
 
 ROOT = Path(__file__).resolve().parents[3]
 MATCHES_PATH = ROOT / "data" / "processed" / "matches_2020_plus.csv"
@@ -219,6 +220,7 @@ def _groups_to_team_states(
             TeamState(
                 team_id=name,
                 elo=float(elo_map.get(name, 1500.0)),
+                squad_index=float(squad_index_for(name)),
                 confederation=CONFED.get(name),
                 group=gname,
             )

@@ -155,6 +155,27 @@ def test_elo_decision_window_is_2020_plus():
         assert len(elo) > 20
 
 
+def test_squad_strength_and_poisson_feature():
+    from app.services.poisson_model import PoissonMatchModel
+    from app.services.squad_strength import build_squad_strength_table, squad_index_for
+
+    table = build_squad_strength_table()
+    assert len(table) >= 40
+    assert "squad_index" in table.columns
+    top = set(table.head(8)["team"])
+    assert top & {"England", "France", "Spain", "Portugal", "Germany", "Brazil", "Argentina"}
+
+    model = PoissonMatchModel()
+    weak = model.predict(
+        home_elo=1800, away_elo=1800, home_squad_index=1.0, away_squad_index=-1.0
+    )
+    even = model.predict(
+        home_elo=1800, away_elo=1800, home_squad_index=0.0, away_squad_index=0.0
+    )
+    assert weak.p_home > even.p_home
+    assert squad_index_for("Argentina") != 0.0 or squad_index_for("Spain") != 0.0
+
+
 def test_dixon_coles_toggle():
     m1 = PoissonMatchModel(PoissonModelConfig(use_dixon_coles=False))
     m2 = PoissonMatchModel(PoissonModelConfig(use_dixon_coles=True, dixon_coles_rho=-0.1))

@@ -117,7 +117,8 @@ export default function App() {
           </div>
           <p className="section-note">
             Conditional on France, Spain, England, and Argentina reaching the semis. Only the
-            remaining path (2 semis + final) is simulated.
+            remaining path (2 semis + final) is simulated. <em>Squad</em> is a club-form index
+            (ClubElo of employers + league per-90 attack + market value).
           </p>
 
           {ffLoading && !finalFour ? (
@@ -156,6 +157,7 @@ export default function App() {
                     <tr>
                       <th>Team</th>
                       <th>Elo</th>
+                      <th>Squad</th>
                       <th>P(Final)</th>
                       <th>P(Champion)</th>
                     </tr>
@@ -165,6 +167,9 @@ export default function App() {
                       <tr key={t.team_id}>
                         <td className="team">{t.team_id}</td>
                         <td>{Math.round(t.elo)}</td>
+                        <td>{(t.squad_index ?? 0) >= 0 ? "+" : ""}
+                          {(t.squad_index ?? 0).toFixed(2)}
+                        </td>
                         <td>{pct(t.p_final)}</td>
                         <td className="win">
                           <span

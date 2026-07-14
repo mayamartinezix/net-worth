@@ -49,6 +49,7 @@ class TeamState:
     team_id: str
     elo: float
     form: float = 0.0
+    squad_index: float = 0.0  # club-performance composite (z-score within field)
     confederation: str | None = None
     group: str | None = None
 
@@ -139,6 +140,8 @@ class TournamentSimulator:
             away_elo=away.elo,
             home_form=home.form,
             away_form=away.form,
+            home_squad_index=home.squad_index,
+            away_squad_index=away.squad_index,
             is_neutral=is_neutral,
             home_confed=home.confederation,
             away_confed=away.confederation,

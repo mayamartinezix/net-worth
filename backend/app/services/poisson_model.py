@@ -46,6 +46,7 @@ class PoissonModelConfig:
     home_advantage_log: float = 0.20  # ~22% lift in λ_home at neutral=False
     elo_coef: float = 0.35            # log-λ sensitivity to Elo diff / 100
     form_coef: float = 0.15
+    squad_coef: float = 0.12          # log-λ sensitivity to squad_index differential
     confederation_adjustment: bool = False
     confederation_effects: dict[str, float] = field(
         default_factory=lambda: {
@@ -97,6 +98,8 @@ class PoissonMatchModel:
         away_elo: float,
         home_form: float = 0.0,
         away_form: float = 0.0,
+        home_squad_index: float = 0.0,
+        away_squad_index: float = 0.0,
         is_neutral: bool = True,
         home_confed: str | None = None,
         away_confed: str | None = None,
@@ -104,9 +107,20 @@ class PoissonMatchModel:
         cfg = self.config
         elo_diff = (home_elo - away_elo) / 100.0
         form_diff = home_form - away_form
+        squad_diff = home_squad_index - away_squad_index
 
-        log_lh = np.log(cfg.base_lambda) + cfg.elo_coef * elo_diff + cfg.form_coef * form_diff
-        log_la = np.log(cfg.base_lambda) - cfg.elo_coef * elo_diff - cfg.form_coef * form_diff
+        log_lh = (
+            np.log(cfg.base_lambda)
+            + cfg.elo_coef * elo_diff
+            + cfg.form_coef * form_diff
+            + cfg.squad_coef * squad_diff
+        )
+        log_la = (
+            np.log(cfg.base_lambda)
+            - cfg.elo_coef * elo_diff
+            - cfg.form_coef * form_diff
+            - cfg.squad_coef * squad_diff
+        )
 
         if not is_neutral:
             log_lh += cfg.home_advantage_log
@@ -124,11 +138,13 @@ class PoissonMatchModel:
                 self.params_.get("intercept_home", np.log(cfg.base_lambda))
                 + self.params_.get("elo_coef", cfg.elo_coef) * elo_diff
                 + self.params_.get("form_coef", cfg.form_coef) * form_diff
+                + self.params_.get("squad_coef", cfg.squad_coef) * squad_diff
             )
             log_la = (
                 self.params_.get("intercept_away", np.log(cfg.base_lambda))
                 - self.params_.get("elo_coef", cfg.elo_coef) * elo_diff
                 - self.params_.get("form_coef", cfg.form_coef) * form_diff
+                - self.params_.get("squad_coef", cfg.squad_coef) * squad_diff
             )
             if not is_neutral:
                 log_lh += self.params_.get("home_advantage_log", cfg.home_advantage_log)
@@ -171,6 +187,8 @@ class PoissonMatchModel:
         away_elo: float,
         home_form: float = 0.0,
         away_form: float = 0.0,
+        home_squad_index: float = 0.0,
+        away_squad_index: float = 0.0,
         is_neutral: bool = True,
         home_confed: str | None = None,
         away_confed: str | None = None,
@@ -180,6 +198,8 @@ class PoissonMatchModel:
             away_elo=away_elo,
             home_form=home_form,
             away_form=away_form,
+            home_squad_index=home_squad_index,
+            away_squad_index=away_squad_index,
             is_neutral=is_neutral,
             home_confed=home_confed,
             away_confed=away_confed,
