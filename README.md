@@ -117,14 +117,47 @@ JSON format config → group RR → seeding → knockout (ET skipped; penalties 
 
 ---
 
+## Live demo
+
+While the cloud agent is running, the app is served at:
+
+**https://tuition-rank-pontiac-commerce.trycloudflare.com**
+
+- UI: `/`
+- API health: `/api/v1/health`
+- API docs: `/docs`
+
+Locally:
+
+```bash
+cd frontend && npm install && npm run build
+PYTHONPATH=backend uvicorn app.main:app --app-dir backend --host 0.0.0.0 --port 8000
+```
+
+## Data (historical results, rankings, odds)
+
+
+Public datasets are already pulled into `data/`. See **[docs/DATA.md](docs/DATA.md)** for the layout.
+
+```bash
+PYTHONPATH=backend python backend/scripts/ingest_public_data.py
+```
+
+| Input | Status |
+|-------|--------|
+| International results (WC + Euros editions) | ✅ gathered |
+| FIFA ranking history | ✅ gathered |
+| World Cup closing/average odds (2018, 2022) | ✅ gathered |
+| UEFA Euro odds | ❌ drop CSVs in `data/odds/euro_*_odds.csv` if you want market baselines for Euros |
+
 ## Build order (status)
 
 | Phase | Status |
 |-------|--------|
-| 1 Data & ratings (Elo + schema) | Scaffolded |
+| 1 Data & ratings (Elo + schema) | Scaffolded + public data ingested |
 | 2 Match model (Poisson + rationale) | Implemented |
 | 3 Simulation engine + convergence / vectorization | Implemented |
-| 4 Full validation memo + historical backtests | Memo template + hooks; backtest numbers TBD with real data pull |
+| 4 Full validation memo + historical backtests | Memo + data ready; run backtest script next |
 | 5 FastAPI | Demo endpoints live |
 | 6 Frontend | Dashboard scaffold |
 | 7 Portfolio polish | This README + docs |

@@ -123,7 +123,13 @@ export default function App() {
       </section>
 
       <footer className="footer">
-        <a href="/docs/MODEL_VALIDATION.md">Model validation memo</a>
+        <a href="/docs" target="_blank" rel="noreferrer">
+          API docs
+        </a>
+        <span>·</span>
+        <a href="https://github.com/mayamartinezix/net-worth/blob/cursor/soccer-tournament-prediction-b74c/docs/MODEL_VALIDATION.md">
+          Model validation memo
+        </a>
         <span>·</span>
         <span>SE ∝ 1/√N</span>
       </footer>
