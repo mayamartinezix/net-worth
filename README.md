@@ -121,10 +121,14 @@ JSON format config → group RR → seeding → knockout (ET skipped; penalties 
 
 While the cloud agent is running, the app is served at:
 
-**https://tuition-rank-pontiac-commerce.trycloudflare.com**
+**https://manhattan-rendering-sugar-spanking.trycloudflare.com**
+
+Toggle **World Cup 2026** / **Euro 2024** and read champion, final, semi, and quarter probabilities.
 
 - UI: `/`
 - API health: `/api/v1/health`
+- Competitions: `/api/v1/competitions`
+- Simulate: `/api/v1/simulate/demo?competition=world_cup_2026`
 - API docs: `/docs`
 
 Locally:
@@ -145,9 +149,9 @@ PYTHONPATH=backend python backend/scripts/ingest_public_data.py
 
 | Input | Status |
 |-------|--------|
-| International results (WC + Euros editions) | ✅ gathered |
+| International results (WC + Euros editions) | ✅ gathered incl. **WC 2026** (`matches_wc_2026.csv`) |
 | FIFA ranking history | ✅ gathered |
-| World Cup closing/average odds (2018, 2022) | ✅ gathered |
+| World Cup odds (2014/2018/2022/**2026**) | ✅ gathered |
 | UEFA Euro odds | ❌ drop CSVs in `data/odds/euro_*_odds.csv` if you want market baselines for Euros |
 
 ## Build order (status)

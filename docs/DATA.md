@@ -15,6 +15,7 @@ data/
     matches_2010_plus.csv
     matches_wc_2018.csv
     matches_wc_2022.csv
+    matches_wc_2026.csv
     matches_euro_2016.csv
     matches_euro_2020.csv      # staged in 2021
     matches_euro_2024.csv
@@ -25,6 +26,7 @@ data/
     WorldCup2026.xlsx          # Source workbook from football-data.co.uk
     wc_2018_odds.csv           # Auto-exported
     wc_2022_odds.csv
+    wc_2026_odds.csv
     wc_2014_odds.csv
     euro_*_odds.csv            # ← DROP UEFA Euro odds HERE (not auto-fetched)
   sample/                      # Tiny fixtures for unit tests only

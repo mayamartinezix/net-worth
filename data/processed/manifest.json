@@ -18,6 +18,15 @@
     "date_max": "2022-12-18"
   },
   {
+    "slug": "wc_2026",
+    "competition": "FIFA World Cup",
+    "year": 2026,
+    "n_matches": 100,
+    "path": "data/processed/matches_wc_2026.csv",
+    "date_min": "2026-06-11",
+    "date_max": "2026-07-11"
+  },
+  {
     "slug": "euro_2016",
     "competition": "UEFA Euro",
     "year": 2016,

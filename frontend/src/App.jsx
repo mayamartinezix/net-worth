@@ -2,9 +2,14 @@ import { useEffect, useState, useTransition } from "react";
 
 const API = "/api/v1";
 
+const COMPETITIONS = [
+  { id: "world_cup_2026", label: "World Cup 2026" },
+  { id: "euros_2024", label: "Euro 2024" },
+];
+
 export default function App() {
   const [health, setHealth] = useState(null);
-  const [match, setMatch] = useState(null);
+  const [competition, setCompetition] = useState("world_cup_2026");
   const [odds, setOdds] = useState(null);
   const [error, setError] = useState(null);
   const [pending, startTransition] = useTransition();
@@ -16,34 +21,18 @@ export default function App() {
       .catch(() => setHealth({ status: "offline" }));
   }, []);
 
-  function runMatchPredict() {
-    setError(null);
-    startTransition(async () => {
-      try {
-        const r = await fetch(`${API}/predict/match`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            home_team: "BRA",
-            away_team: "GHA",
-            home_elo: 2100,
-            away_elo: 1620,
-            is_neutral: true,
-          }),
-        });
-        if (!r.ok) throw new Error(await r.text());
-        setMatch(await r.json());
-      } catch (e) {
-        setError(String(e.message || e));
-      }
-    });
-  }
+  useEffect(() => {
+    runSim(competition);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [competition]);
 
-  function runDemoSim() {
+  function runSim(comp) {
     setError(null);
     startTransition(async () => {
       try {
-        const r = await fetch(`${API}/simulate/demo?n_sims=300&seed=42`);
+        const r = await fetch(
+          `${API}/simulate/demo?competition=${encodeURIComponent(comp)}&n_sims=200&seed=42`
+        );
         if (!r.ok) throw new Error(await r.text());
         setOdds(await r.json());
       } catch (e) {
@@ -52,96 +41,100 @@ export default function App() {
     });
   }
 
-  const topOdds = odds?.teams?.slice(0, 8) ?? [];
+  const teams = odds?.teams ?? [];
+  const showR32 = competition === "world_cup_2026";
 
   return (
     <div className="page">
-      <header className="hero">
-        <div className="hero-bg" aria-hidden="true" />
-        <div className="hero-content">
+      <header className="top">
+        <div className="top-inner">
           <p className="brand">PitchPath</p>
-          <h1>Tournament odds from Monte Carlo paths</h1>
+          <h1>Tournament odds, simply.</h1>
           <p className="lede">
-            Elo → Poisson scorelines → config-driven World Cup &amp; Euros simulation.
-            Built as a risk-modeling portfolio piece, not a betting tip sheet.
+            Monte Carlo paths for World Cup and Euros — champion, final, semi, and quarter probabilities.
           </p>
-          <div className="cta-row">
-            <button type="button" onClick={runMatchPredict} disabled={pending}>
-              Predict BRA vs GHA
-            </button>
-            <button type="button" className="ghost" onClick={runDemoSim} disabled={pending}>
-              Run demo tournament (N=300)
-            </button>
+
+          <div className="seg" role="tablist" aria-label="Competition">
+            {COMPETITIONS.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                role="tab"
+                aria-selected={competition === c.id}
+                className={competition === c.id ? "seg-btn active" : "seg-btn"}
+                onClick={() => setCompetition(c.id)}
+                disabled={pending}
+              >
+                {c.label}
+              </button>
+            ))}
           </div>
+
           <p className="status">
-            API: {health?.status ?? "…"}
-            {pending ? " · running…" : ""}
+            {odds?.label ?? "Loading"} · N={odds?.n_sims ?? "…"} · API {health?.status ?? "…"}
+            {pending ? " · simulating…" : ""}
           </p>
         </div>
       </header>
 
       {error && <p className="error">{error}</p>}
 
-      <section className="section" aria-labelledby="match-heading">
-        <h2 id="match-heading">Match prediction</h2>
-        <p className="section-lede">Win / draw / loss from the independent Poisson goal model.</p>
-        {match ? (
-          <div className="prob-row">
-            <Prob label={`${match.home_team} win`} value={match.p_home} />
-            <Prob label="Draw" value={match.p_draw} />
-            <Prob label={`${match.away_team} win`} value={match.p_away} />
-            <p className="meta">
-              λ<sub>home</sub>={match.lambda_home.toFixed(2)} · λ<sub>away</sub>=
-              {match.lambda_away.toFixed(2)}
-            </p>
+      <section className="section" aria-labelledby="odds-heading">
+        <div className="section-head">
+          <h2 id="odds-heading">Round likelihoods</h2>
+          <button type="button" className="text-btn" onClick={() => runSim(competition)} disabled={pending}>
+            Re-run
+          </button>
+        </div>
+
+        {teams.length ? (
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Team</th>
+                  {showR32 && <th>R32</th>}
+                  <th>QF</th>
+                  <th>SF</th>
+                  <th>Final</th>
+                  <th>Win</th>
+                </tr>
+              </thead>
+              <tbody>
+                {teams.map((t) => (
+                  <tr key={t.team_id}>
+                    <td className="team">{t.team_id}</td>
+                    {showR32 && <td>{pct(t.p_r32)}</td>}
+                    <td>{pct(t.p_quarterfinal)}</td>
+                    <td>{pct(t.p_semifinal)}</td>
+                    <td>{pct(t.p_final)}</td>
+                    <td className="win">
+                      <span className="win-bar" style={{ width: `${Math.max(t.p_champion * 100, 1.5)}%` }} />
+                      <span>{pct(t.p_champion)}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         ) : (
-          <p className="placeholder">Run a matchup to see probabilities.</p>
-        )}
-      </section>
-
-      <section className="section" aria-labelledby="odds-heading">
-        <h2 id="odds-heading">Title odds (demo field)</h2>
-        <p className="section-lede">
-          Cached-style demo at small N for interactivity. Production odds are batch-simulated.
-        </p>
-        {topOdds.length ? (
-          <ol className="odds-list">
-            {topOdds.map((t) => (
-              <li key={t.team_id}>
-                <span className="code">{t.team_id}</span>
-                <span className="bar-wrap">
-                  <span className="bar" style={{ width: `${t.p_champion * 100}%` }} />
-                </span>
-                <span className="pct">{(t.p_champion * 100).toFixed(1)}%</span>
-              </li>
-            ))}
-          </ol>
-        ) : (
-          <p className="placeholder">Run the demo tournament simulation.</p>
+          <p className="placeholder">{pending ? "Simulating…" : "No results yet."}</p>
         )}
       </section>
 
       <footer className="footer">
         <a href="/docs" target="_blank" rel="noreferrer">
-          API docs
+          API
         </a>
         <span>·</span>
-        <a href="https://github.com/mayamartinezix/net-worth/blob/cursor/soccer-tournament-prediction-b74c/docs/MODEL_VALIDATION.md">
-          Model validation memo
+        <a href="https://github.com/mayamartinezix/net-worth/blob/main/docs/MODEL_VALIDATION.md">
+          Validation memo
         </a>
-        <span>·</span>
-        <span>SE ∝ 1/√N</span>
       </footer>
     </div>
   );
 }
 
-function Prob({ label, value }) {
-  return (
-    <div className="prob">
-      <span className="prob-label">{label}</span>
-      <span className="prob-value">{(value * 100).toFixed(1)}%</span>
-    </div>
-  );
+function pct(v) {
+  return `${((v || 0) * 100).toFixed(1)}%`;
 }

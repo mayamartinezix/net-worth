@@ -43,6 +43,7 @@ WC_ODDS_URL = "https://www.football-data.co.uk/WorldCup2026.xlsx"
 TARGET_EDITIONS = [
     {"competition": "FIFA World Cup", "year": 2018, "slug": "wc_2018"},
     {"competition": "FIFA World Cup", "year": 2022, "slug": "wc_2022"},
+    {"competition": "FIFA World Cup", "year": 2026, "slug": "wc_2026"},
     {"competition": "UEFA Euro", "year": 2016, "slug": "euro_2016"},
     {"competition": "UEFA Euro", "year": 2020, "slug": "euro_2020"},  # played 2021
     {"competition": "UEFA Euro", "year": 2024, "slug": "euro_2024"},
@@ -100,6 +101,7 @@ def export_wc_odds(xlsx_path: Path) -> list[Path]:
         "WorldCup2018": "wc_2018_odds.csv",
         "WorldCup2022": "wc_2022_odds.csv",
         "WorldCup2014": "wc_2014_odds.csv",
+        "WorldCup2026": "wc_2026_odds.csv",
     }
     for sheet, fname in sheet_map.items():
         if sheet not in xl.sheet_names:

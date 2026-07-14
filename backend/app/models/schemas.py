@@ -43,15 +43,29 @@ class TeamOdds(BaseModel):
     p_semifinal: float
     p_quarterfinal: float
     p_r16: float
+    p_r32: float = 0.0
     p_group_exit: float
     se_champion: float
 
 
 class SimulationResponse(BaseModel):
+    competition: str
     format_key: str
+    label: str
     n_sims: int
     rng_seed: int | None
     teams: list[TeamOdds]
+
+
+class CompetitionInfo(BaseModel):
+    id: str
+    label: str
+    format_key: str
+    n_teams: int
+
+
+class CompetitionsResponse(BaseModel):
+    competitions: list[CompetitionInfo]
 
 
 class HealthResponse(BaseModel):

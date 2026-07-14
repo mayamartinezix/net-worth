@@ -112,10 +112,27 @@ def test_simulator_probabilities_sum_to_one():
     total = sum(agg.p_champion.values())
     assert total == pytest.approx(1.0, abs=1e-9)
     assert len(agg.team_ids) == 32
-    # SE formula check for one team
     tid = agg.team_ids[0]
     p = agg.p_champion[tid]
     assert agg.se_champion[tid] == pytest.approx(math.sqrt(p * (1 - p) / 200), rel=1e-9)
+
+
+def test_wc48_and_euros_smoke():
+    from app.services.tournament_fields import build_euro2024_groups, build_wc2026_groups
+
+    euro = TournamentSimulator(format_key="euros_24", rng_seed=7).run(
+        build_euro2024_groups(), n_sims=25
+    )
+    assert len(euro.team_ids) == 24
+    assert sum(euro.p_champion.values()) == pytest.approx(1.0, abs=1e-9)
+    assert sum(euro.p_semifinal.values()) == pytest.approx(4.0, abs=1e-9)
+
+    wc = TournamentSimulator(format_key="world_cup_48", rng_seed=8).run(
+        build_wc2026_groups(), n_sims=20
+    )
+    assert len(wc.team_ids) == 48
+    assert sum(wc.p_champion.values()) == pytest.approx(1.0, abs=1e-9)
+    assert sum(wc.p_r32.values()) == pytest.approx(32.0, abs=1e-9)
 
 
 def test_dixon_coles_toggle():

@@ -83,6 +83,7 @@ class SimulationAggregate:
     p_r16: dict[str, float]
     p_group_exit: dict[str, float]
     se_champion: dict[str, float] = field(default_factory=dict)
+    p_r32: dict[str, float] = field(default_factory=dict)
 
     def to_records(self) -> list[dict[str, Any]]:
         rows = []
@@ -95,6 +96,7 @@ class SimulationAggregate:
                     "p_semifinal": self.p_semifinal.get(tid, 0.0),
                     "p_quarterfinal": self.p_quarterfinal.get(tid, 0.0),
                     "p_r16": self.p_r16.get(tid, 0.0),
+                    "p_r32": self.p_r32.get(tid, 0.0),
                     "p_group_exit": self.p_group_exit.get(tid, 0.0),
                     "se_champion": self.se_champion.get(tid, 0.0),
                 }
@@ -228,16 +230,11 @@ class TournamentSimulator:
                 thirds.append((ranked[2], team_lookup[ranked[2].team_id], gname))
 
         qualified: list[TeamState] = []
-        # Standard seeding placeholder: winners then runners then best thirds
-        # Bracket wiring is format-specific; for probability aggregation we only
-        # need the qualified set + a deterministic pairing rule.
-        if self.config["key"] == "world_cup_32":
-            # R16 pairs: 1A/2B, 1B/2A, 1C/2D, 1D/2C, ...
-            order = []
+        key = self.config["key"]
+        if key == "world_cup_32":
             group_names = sorted(groups.keys())
             w_map = {gn: winners[i] for i, gn in enumerate(group_names)}
             r_map = {gn: runners[i] for i, gn in enumerate(group_names)}
-            # Classic WC R16 pairing pattern (1A/2B, 1C/2D, ...)
             classic = [
                 (w_map["A"], r_map["B"]),
                 (w_map["C"], r_map["D"]),
@@ -248,11 +245,20 @@ class TournamentSimulator:
                 (w_map["F"], r_map["E"]),
                 (w_map["H"], r_map["G"]),
             ]
+            order: list[TeamState] = []
             for home, away in classic:
                 order.extend([home, away])
             qualified = order
+        elif key in {"euros_24", "world_cup_48"}:
+            # Top 2 from each group + best thirds (4 for Euros, 8 for WC 48)
+            thirds_sorted = sorted(thirds, key=lambda x: x[0].sort_key(), reverse=True)
+            best_thirds = [t[1] for t in thirds_sorted[:best_thirds_n]]
+            # Deterministic pairing: winners, runners-up, then best thirds
+            qualified = winners + runners + best_thirds
+            # Ensure even bracket size
+            if len(qualified) % 2 == 1:
+                raise RuntimeError(f"{key} produced odd qualifier count: {len(qualified)}")
         else:
-            # Euros 24: top 2 + 4 best thirds
             thirds_sorted = sorted(thirds, key=lambda x: x[0].sort_key(), reverse=True)
             best_thirds = [t[1] for t in thirds_sorted[:best_thirds_n]]
             qualified = winners + runners + best_thirds
@@ -283,7 +289,9 @@ class TournamentSimulator:
         stage_names = stages
         # Infer starting stage by bracket size
         n = len(current)
-        if n == 16:
+        if n == 32 and "round_of_32" in stage_names:
+            stage_idx = stage_names.index("round_of_32")
+        elif n == 16:
             stage_idx = stage_names.index("round_of_16")
         elif n == 8:
             stage_idx = stage_names.index("quarterfinal")
@@ -292,7 +300,6 @@ class TournamentSimulator:
         elif n == 2:
             stage_idx = stage_names.index("final")
         else:
-            # Pad / trim not supported — caller must seed correctly
             raise ValueError(f"Unsupported bracket size: {n}")
 
         for si in range(stage_idx, len(stage_names)):
@@ -329,6 +336,7 @@ class TournamentSimulator:
             "semifinal": defaultdict(int),
             "quarterfinal": defaultdict(int),
             "r16": defaultdict(int),
+            "r32": defaultdict(int),
             "group_exit": defaultdict(int),
         }
 
@@ -336,13 +344,12 @@ class TournamentSimulator:
             qualified, eliminated, _ = self.simulate_group_stage(groups)
             for t in eliminated:
                 counts["group_exit"][t.team_id] += 1
-            for t in qualified:
-                # Reached at least R16 / first KO stage
-                counts["r16"][t.team_id] += 1
 
             reached = self.simulate_knockout(qualified)
+            for tid in reached.get("round_of_32", set()):
+                counts["r32"][tid] += 1
             for tid in reached.get("round_of_16", set()):
-                counts["r16"][tid] += 0  # already counted
+                counts["r16"][tid] += 1
             for tid in reached.get("quarterfinal", set()):
                 counts["quarterfinal"][tid] += 1
             for tid in reached.get("semifinal", set()):
@@ -356,7 +363,6 @@ class TournamentSimulator:
             return {tid: counter.get(tid, 0) / n_sims for tid in team_ids}
 
         p_champ = probs(counts["champion"])
-        # Bernoulli SE: sqrt(p(1-p)/N) — core Monte Carlo error scaling
         se = {
             tid: float(np.sqrt(p * (1.0 - p) / n_sims)) for tid, p in p_champ.items()
         }
@@ -371,6 +377,7 @@ class TournamentSimulator:
             p_r16=probs(counts["r16"]),
             p_group_exit=probs(counts["group_exit"]),
             se_champion=se,
+            p_r32=probs(counts["r32"]),
         )
 
 
