@@ -135,6 +135,16 @@ def test_wc48_and_euros_smoke():
     assert sum(wc.p_r32.values()) == pytest.approx(32.0, abs=1e-9)
 
 
+def test_final_four_compare():
+    from app.services.final_four import compare_final_four
+
+    out = compare_final_four(n_sims=800, seed=11)
+    assert len(out["teams"]) == 4
+    assert sum(t["p_champion"] for t in out["teams"]) == pytest.approx(1.0, abs=1e-9)
+    for t in out["teams"]:
+        assert t["p_champion"] <= t["p_final"] + 1e-12
+
+
 def test_dixon_coles_toggle():
     m1 = PoissonMatchModel(PoissonModelConfig(use_dixon_coles=False))
     m2 = PoissonMatchModel(PoissonModelConfig(use_dixon_coles=True, dixon_coles_rho=-0.1))

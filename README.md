@@ -121,9 +121,11 @@ JSON format config → group RR → seeding → knockout (ET skipped; penalties 
 
 While the cloud agent is running, the app is served at:
 
-**https://manhattan-rendering-sugar-spanking.trycloudflare.com**
+**https://generate-veterinary-wing-publishing.trycloudflare.com**
 
-Toggle **World Cup 2026** / **Euro 2024** and read champion, final, semi, and quarter probabilities.
+Toggle **World Cup 2026** / **Euro 2024**. On World Cup, a **Final Four** section compares France / Spain / England / Argentina for the remaining path.
+
+Known gaps (seeding, live full-field conditioning, etc.): [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md).
 
 - UI: `/`
 - API health: `/api/v1/health`

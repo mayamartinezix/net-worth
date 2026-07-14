@@ -93,6 +93,23 @@ def slice_edition(matches: pd.DataFrame, competition: str, year: int) -> pd.Data
     return m[m["year"] == year].drop(columns=["year"])
 
 
+ODDS_TEAM_ALIASES = {
+    "USA": "United States",
+    "Bosnia & Herzegovina": "Bosnia and Herzegovina",
+    "Curacao": "Curaçao",
+    "D.R. Congo": "DR Congo",
+    "Korea Republic": "South Korea",
+    "IR Iran": "Iran",
+    "Czechia": "Czech Republic",
+}
+
+
+def normalize_team_name(name: str) -> str:
+    if name is None or (isinstance(name, float) and pd.isna(name)):
+        return name
+    return ODDS_TEAM_ALIASES.get(str(name).strip(), str(name).strip())
+
+
 def export_wc_odds(xlsx_path: Path) -> list[Path]:
     """Flatten World Cup odds sheets into tidy CSVs under data/odds/."""
     xl = pd.ExcelFile(xlsx_path)
@@ -128,9 +145,13 @@ def export_wc_odds(xlsx_path: Path) -> list[Path]:
             elif cl == "AGFT":
                 rename[c] = "away_goals"
         df = df.rename(columns=rename)
+        if "home_team" in df.columns:
+            df["home_team"] = df["home_team"].map(normalize_team_name)
+        if "away_team" in df.columns:
+            df["away_team"] = df["away_team"].map(normalize_team_name)
         if "match_date" in df.columns:
             df["match_date"] = pd.to_datetime(df["match_date"]).dt.date.astype(str)
-        # Implied probabilities from avg decimal odds (overround not removed yet)
+        # Implied probabilities from avg decimal odds (overround removed)
         if {"odds_home_avg", "odds_draw_avg", "odds_away_avg"} <= set(df.columns):
             inv = 1.0 / df[["odds_home_avg", "odds_draw_avg", "odds_away_avg"]].astype(float)
             s = inv.sum(axis=1)

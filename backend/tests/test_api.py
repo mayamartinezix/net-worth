@@ -61,5 +61,19 @@ def test_simulate_demo_wc2026():
     assert body["format_key"] == "world_cup_48"
     assert len(body["teams"]) == 48
     assert abs(sum(t["p_champion"] for t in body["teams"]) - 1.0) < 1e-6
-    # At least some teams should reach R32 in aggregate
     assert max(t["p_r32"] for t in body["teams"]) > 0.2
+
+
+def test_final_four_wc2026():
+    r = client.get("/api/v1/final-four/world_cup_2026", params={"n_sims": 500, "seed": 3})
+    assert r.status_code == 200
+    body = r.json()
+    assert len(body["teams"]) == 4
+    assert len(body["semifinals"]) == 2
+    names = {t["team_id"] for t in body["teams"]}
+    assert names == {"France", "Spain", "England", "Argentina"}
+    assert abs(sum(t["p_champion"] for t in body["teams"]) - 1.0) < 1e-6
+    # Each SF winner is in the final → sum of p_final ≈ 2
+    assert abs(sum(t["p_final"] for t in body["teams"]) - 2.0) < 1e-6
+    for s in body["semifinals"]:
+        assert abs(s["p_home_advance"] + s["p_away_advance"] - 1.0) < 1e-6

@@ -12,12 +12,16 @@ from fastapi import APIRouter, HTTPException, Query
 from app.models.schemas import (
     CompetitionInfo,
     CompetitionsResponse,
+    FinalFourResponse,
+    FinalFourTeam,
     MatchPredictRequest,
     MatchPredictionResponse,
     ScorelineProb,
+    SemifinalPreview,
     SimulationResponse,
     TeamOdds,
 )
+from app.services.final_four import compare_final_four
 from app.services.poisson_model import PoissonMatchModel, PoissonModelConfig
 from app.services.simulator import TournamentSimulator, build_demo_world_cup_groups
 from app.services.tournament_fields import build_euro2024_groups, build_wc2026_groups
@@ -134,4 +138,23 @@ def simulate_demo(
         n_sims=n_sims,
         rng_seed=seed,
         teams=teams,
+    )
+
+
+@router.get("/final-four/world_cup_2026", response_model=FinalFourResponse)
+def world_cup_2026_final_four(
+    n_sims: int = Query(3_000, ge=100, le=50_000),
+    seed: int = Query(42),
+) -> FinalFourResponse:
+    """Compare the confirmed World Cup 2026 semifinalists."""
+    raw = compare_final_four(n_sims=n_sims, seed=seed)
+    return FinalFourResponse(
+        edition=raw["edition"],
+        label=raw["label"],
+        as_of=raw["as_of"],
+        n_sims=raw["n_sims"],
+        rng_seed=raw["rng_seed"],
+        semifinals=[SemifinalPreview(**s) for s in raw["semifinals"]],
+        teams=[FinalFourTeam(**t) for t in raw["teams"]],
+        notes=raw["notes"],
     )
