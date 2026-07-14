@@ -1,21 +1,30 @@
 #!/usr/bin/env python3
 """Download / refresh public datasets used for Elo, backtests, and market baselines.
 
+Decision window
+---------------
+Model decisions (Elo fitting used in live simulations) use internationals from
+**2020-01-01 onward only** (`matches_2020_plus.csv`).
+
 Sources
 -------
 - martj42/international_results (CC0): all men's full internationals
 - Dato-Futbol/fifa-ranking: historical FIFA ranking points
-- football-data.co.uk WorldCup2026.xlsx: WC 2014/2018/2022 (+ upcoming) with odds
+- cnc8/fifa-world-ranking: alternate FIFA ranking snapshot schema
+- football-data.co.uk WorldCup2026.xlsx: WC odds / results sheets
+- eloratings.net World.tsv + en.teams.tsv: World Football Elo Ratings snapshot
+- openfootball/worldcup.json: WC 2026 groups / teams / stadiums
 
 Usage
 -----
   PYTHONPATH=backend python backend/scripts/ingest_public_data.py
-  PYTHONPATH=backend python backend/scripts/ingest_public_data.py --skip-download  # process only
+  PYTHONPATH=backend python backend/scripts/ingest_public_data.py --skip-download
 """
 
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import urllib.request
 from pathlib import Path
@@ -27,6 +36,8 @@ RAW = ROOT / "data" / "raw"
 PROCESSED = ROOT / "data" / "processed"
 ODDS = ROOT / "data" / "odds"
 
+DECISION_START = "2020-01-01"
+
 RESULTS_URL = (
     "https://raw.githubusercontent.com/martj42/international_results/master/results.csv"
 )
@@ -37,17 +48,48 @@ FIFA_RANK_URL = (
     "https://raw.githubusercontent.com/Dato-Futbol/fifa-ranking/master/"
     "ranking_fifa_historical.csv"
 )
+FIFA_RANK_CNC8_URL = (
+    "https://raw.githubusercontent.com/cnc8/fifa-world-ranking/master/"
+    "fifa_ranking-2020-12-10.csv"
+)
 WC_ODDS_URL = "https://www.football-data.co.uk/WorldCup2026.xlsx"
+ELORATINGS_WORLD_URL = "https://www.eloratings.net/World.tsv"
+ELORATINGS_TEAMS_URL = "https://www.eloratings.net/en.teams.tsv"
+OPENFOOTBALL_BASE = (
+    "https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026"
+)
 
-# Editions we care about for the validation memo
 TARGET_EDITIONS = [
     {"competition": "FIFA World Cup", "year": 2018, "slug": "wc_2018"},
     {"competition": "FIFA World Cup", "year": 2022, "slug": "wc_2022"},
     {"competition": "FIFA World Cup", "year": 2026, "slug": "wc_2026"},
     {"competition": "UEFA Euro", "year": 2016, "slug": "euro_2016"},
-    {"competition": "UEFA Euro", "year": 2020, "slug": "euro_2020"},  # played 2021
+    {"competition": "UEFA Euro", "year": 2020, "slug": "euro_2020"},
     {"competition": "UEFA Euro", "year": 2024, "slug": "euro_2024"},
 ]
+
+ODDS_TEAM_ALIASES = {
+    "USA": "United States",
+    "Bosnia & Herzegovina": "Bosnia and Herzegovina",
+    "Curacao": "Curaçao",
+    "D.R. Congo": "DR Congo",
+    "Korea Republic": "South Korea",
+    "IR Iran": "Iran",
+    "Czechia": "Czech Republic",
+}
+
+ELORATINGS_NAME_ALIASES = {
+    "United States of America": "United States",
+    "Korea Republic": "South Korea",
+    "IR Iran": "Iran",
+    "Bosnia-Herzegovina": "Bosnia and Herzegovina",
+    "Côte d’Ivoire": "Ivory Coast",
+    "Cote d'Ivoire": "Ivory Coast",
+    "Czechia": "Czech Republic",
+    "Türkiye": "Turkey",
+    "Cape Verde Islands": "Cape Verde",
+    "Congo DR": "DR Congo",
+}
 
 
 def download(url: str, dest: Path) -> None:
@@ -93,21 +135,43 @@ def slice_edition(matches: pd.DataFrame, competition: str, year: int) -> pd.Data
     return m[m["year"] == year].drop(columns=["year"])
 
 
-ODDS_TEAM_ALIASES = {
-    "USA": "United States",
-    "Bosnia & Herzegovina": "Bosnia and Herzegovina",
-    "Curacao": "Curaçao",
-    "D.R. Congo": "DR Congo",
-    "Korea Republic": "South Korea",
-    "IR Iran": "Iran",
-    "Czechia": "Czech Republic",
-}
-
-
 def normalize_team_name(name: str) -> str:
     if name is None or (isinstance(name, float) and pd.isna(name)):
         return name
     return ODDS_TEAM_ALIASES.get(str(name).strip(), str(name).strip())
+
+
+def process_eloratings_snapshot() -> Path | None:
+    world_path = RAW / "eloratings_world.tsv"
+    teams_path = RAW / "eloratings_en_teams.tsv"
+    if not world_path.exists() or not teams_path.exists():
+        return None
+
+    code_to_name: dict[str, str] = {}
+    with teams_path.open(newline="", encoding="utf-8") as f:
+        for row in csv.reader(f, delimiter="\t"):
+            if not row:
+                continue
+            code = row[0].strip()
+            names = [c.strip() for c in row[1:] if c and c.strip()]
+            if code and names:
+                code_to_name[code] = names[-1]
+
+    world = pd.read_csv(world_path, sep="\t", header=None)
+    out = pd.DataFrame(
+        {
+            "rank": world[0].astype(int),
+            "team_code": world[2].astype(str),
+            "elo": world[3].astype(float),
+            "team": world[2].astype(str).map(lambda c: code_to_name.get(c, c)),
+        }
+    )
+    out["team"] = out["team"].replace(ELORATINGS_NAME_ALIASES)
+    out = out.sort_values("rank").reset_index(drop=True)
+    dest = PROCESSED / "eloratings_world_snapshot.csv"
+    out.to_csv(dest, index=False)
+    print(f"Wrote {dest.name} ({len(out)} teams)")
+    return dest
 
 
 def export_wc_odds(xlsx_path: Path) -> list[Path]:
@@ -177,24 +241,43 @@ def main() -> None:
     results_path = RAW / "results.csv"
     shootouts_path = RAW / "shootouts.csv"
     fifa_path = RAW / "fifa_ranking_historical.csv"
+    fifa_cnc8_path = RAW / "fifa_ranking_cnc8_2020.csv"
     odds_xlsx = ODDS / "WorldCup2026.xlsx"
+    elo_world = RAW / "eloratings_world.tsv"
+    elo_teams = RAW / "eloratings_en_teams.tsv"
 
     if not args.skip_download:
         download(RESULTS_URL, results_path)
         download(SHOOTOUTS_URL, shootouts_path)
         download(FIFA_RANK_URL, fifa_path)
+        download(FIFA_RANK_CNC8_URL, fifa_cnc8_path)
         download(WC_ODDS_URL, odds_xlsx)
+        download(ELORATINGS_WORLD_URL, elo_world)
+        download(ELORATINGS_TEAMS_URL, elo_teams)
+        for name in (
+            "worldcup.json",
+            "worldcup.groups.json",
+            "worldcup.teams.json",
+            "worldcup.stadiums.json",
+        ):
+            download(f"{OPENFOOTBALL_BASE}/{name}", RAW / f"wc2026_openfootball_{name}")
 
     results = pd.read_csv(results_path)
     matches = to_model_schema(results)
     matches.to_csv(PROCESSED / "matches_all.csv", index=False)
     print(f"Wrote matches_all.csv ({len(matches)} rows)")
 
-    # Training corridor: internationals before each tournament can be derived
-    # from matches_all; also emit a compact post-2010 slice for faster Elo fits.
-    recent = matches[matches["match_date"] >= "2010-01-01"]
-    recent.to_csv(PROCESSED / "matches_2010_plus.csv", index=False)
-    print(f"Wrote matches_2010_plus.csv ({len(recent)} rows)")
+    # Legacy 2010+ slice kept for experimentation; decisions use 2020+.
+    recent_2010 = matches[matches["match_date"] >= "2010-01-01"]
+    recent_2010.to_csv(PROCESSED / "matches_2010_plus.csv", index=False)
+    print(f"Wrote matches_2010_plus.csv ({len(recent_2010)} rows)")
+
+    decision = matches[matches["match_date"] >= DECISION_START]
+    decision.to_csv(PROCESSED / "matches_2020_plus.csv", index=False)
+    print(
+        f"Wrote matches_2020_plus.csv ({len(decision)} rows) "
+        f"[DECISION WINDOW from {DECISION_START}]"
+    )
 
     manifest = []
     for ed in TARGET_EDITIONS:
@@ -218,16 +301,25 @@ def main() -> None:
         so = pd.read_csv(shootouts_path)
         so.to_csv(PROCESSED / "shootouts.csv", index=False)
 
-    # FIFA rankings: keep as-is but ensure sorted
+    # FIFA rankings (full + 2020+ filter)
     fifa = pd.read_csv(fifa_path)
     fifa = fifa.sort_values(["date", "total_points"], ascending=[True, False])
     fifa.to_csv(PROCESSED / "fifa_rankings.csv", index=False)
+    fifa_2020 = fifa[fifa["date"] >= DECISION_START]
+    fifa_2020.to_csv(PROCESSED / "fifa_rankings_2020_plus.csv", index=False)
     print(f"Wrote fifa_rankings.csv ({len(fifa)} rows)")
+    print(f"Wrote fifa_rankings_2020_plus.csv ({len(fifa_2020)} rows)")
+
+    if fifa_cnc8_path.exists():
+        cnc8 = pd.read_csv(fifa_cnc8_path)
+        cnc8.to_csv(PROCESSED / "fifa_rankings_cnc8_snapshot.csv", index=False)
+        print(f"Wrote fifa_rankings_cnc8_snapshot.csv ({len(cnc8)} rows)")
+
+    process_eloratings_snapshot()
 
     if odds_xlsx.exists():
         export_wc_odds(odds_xlsx)
 
-    # Placeholder note for Euros odds (not in football-data WC workbook)
     odds_readme = ODDS / "README.md"
     if not odds_readme.exists():
         odds_readme.write_text(
@@ -239,11 +331,18 @@ def main() -> None:
             "- `euro_2024_odds.csv`\n\n"
             "Required columns (decimal odds):\n"
             "`match_date,home_team,away_team,odds_home_avg,odds_draw_avg,odds_away_avg`\n"
-            "Optional: `home_goals,away_goals`.\n"
-            "Implied probs can be added by re-running ingest or the backtest script.\n"
         )
 
-    (PROCESSED / "manifest.json").write_text(json.dumps(manifest, indent=2))
+    (PROCESSED / "manifest.json").write_text(
+        json.dumps(
+            {
+                "decision_start": DECISION_START,
+                "decision_matches": "data/processed/matches_2020_plus.csv",
+                "editions": manifest,
+            },
+            indent=2,
+        )
+    )
     print("Wrote processed/manifest.json")
 
 

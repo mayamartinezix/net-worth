@@ -1,0 +1,245 @@
+rank,team_code,elo,team
+1,ES,2190.0,Spain
+2,AR,2177.0,Argentina
+3,FR,2163.0,France
+4,EN,2097.0,England
+5,CO,2003.0,Colombia
+6,PT,1995.0,Portugal
+7,BR,1993.0,Brazil
+8,NL,1971.0,Netherlands
+9,NO,1951.0,Norway
+10,BE,1948.0,Belgium
+11,CH,1928.0,Switzerland
+12,MX,1913.0,Mexico
+13,DE,1908.0,Germany
+14,MA,1901.0,Morocco
+15,JP,1888.0,Japan
+16,HR,1881.0,Croatia
+17,EC,1871.0,Ecuador
+18,DK,1869.0,Denmark
+18,IT,1869.0,Italy
+20,TR,1852.0,Turkey
+21,UY,1841.0,Uruguay
+22,AT,1821.0,Austria
+23,SN,1816.0,Senegal
+24,PY,1814.0,Paraguay
+25,AU,1795.0,Australia
+26,UA,1780.0,Ukraine
+27,RU,1772.0,Russia
+28,NG,1767.0,Nigeria
+29,IR,1764.0,Iran
+30,DZ,1756.0,Algeria
+31,US,1747.0,USA
+32,SQ,1745.0,Scotland
+33,GR,1744.0,Greece
+34,EG,1742.0,Egypt
+35,RS,1734.0,Serbia
+36,VE,1733.0,Venezuela
+37,SE,1731.0,Sweden
+38,CA,1729.0,Canada
+39,CI,1727.0,Ivory Coast
+40,KR,1723.0,South Korea
+41,CL,1717.0,Chile
+42,KO,1714.0,Kosovo
+43,HU,1710.0,Hungary
+43,PL,1710.0,Poland
+45,CD,1704.0,DR Congo
+46,PE,1700.0,Peru
+47,IE,1699.0,Ireland
+48,WA,1682.0,Wales
+48,SI,1682.0,Slovenia
+50,CZ,1680.0,Czech Republic
+51,SK,1667.0,Slovakia
+52,PA,1658.0,Panama
+53,GE,1654.0,Georgia
+54,IL,1647.0,Israel
+55,RO,1639.0,Romania
+56,UZ,1631.0,Uzbekistan
+57,JO,1628.0,Jordan
+58,BO,1621.0,Bolivia
+59,CV,1619.0,Cape Verde
+60,AL,1616.0,Albania
+61,CM,1613.0,Cameroon
+62,CR,1608.0,Costa Rica
+63,EI,1605.0,N Ireland
+63,BA,1605.0,Bosnia/Herz
+65,SA,1596.0,Saudi Arabia
+66,NM,1589.0,N Macedonia
+67,ML,1588.0,Mali
+68,GH,1570.0,Ghana
+68,HN,1570.0,Honduras
+70,IS,1568.0,Iceland
+71,TN,1562.0,Tunisia
+72,IQ,1561.0,Iraq
+73,ZA,1559.0,South Africa
+74,AO,1542.0,Angola
+75,AE,1540.0,UAE
+76,FI,1536.0,Finland
+77,NZ,1534.0,New Zealand
+78,BF,1529.0,Burkina Faso
+79,JM,1527.0,Jamaica
+80,BY,1522.0,Belarus
+81,HT,1517.0,Haiti
+82,GT,1504.0,Guatemala
+83,SY,1479.0,Syria
+83,OM,1479.0,Oman
+85,PS,1465.0,Palestine
+86,GN,1463.0,Guinea
+87,ME,1461.0,Montenegro
+88,BG,1458.0,Bulgaria
+89,LU,1450.0,Luxembourg
+90,NS,1442.0,N Cyprus
+91,CW,1438.0,Curaçao
+92,SR,1431.0,Suriname
+93,KZ,1428.0,Kazakhstan
+94,CN,1424.0,China
+94,KD,1424.0,Kurdistan
+96,LY,1420.0,Libya
+97,GM,1419.0,Gambia
+98,BH,1414.0,Bahrain
+99,QA,1411.0,Qatar
+100,BJ,1405.0,Benin
+101,GA,1401.0,Gabon
+102,UG,1394.0,Uganda
+103,TT,1386.0,Trinidad/Tob
+103,FO,1386.0,Faroe Islands
+105,NE,1382.0,Niger
+106,MG,1380.0,Madagascar
+106,GQ,1380.0,Eq Guinea
+108,TG,1379.0,Togo
+109,TH,1376.0,Thailand
+110,KP,1375.0,North Korea
+111,AM,1373.0,Armenia
+111,KM,1373.0,Comoros
+113,ZW,1372.0,Zimbabwe
+113,ID,1372.0,Indonesia
+115,ZM,1371.0,Zambia
+116,KE,1363.0,Kenya
+117,EE,1360.0,Estonia
+118,VN,1351.0,Vietnam
+119,SD,1350.0,Sudan
+120,RE,1345.0,Reunion
+121,SV,1342.0,El Salvador
+121,MZ,1342.0,Mozambique
+123,SL,1341.0,Sierra Leone
+124,GP,1338.0,Guadeloupe
+125,RW,1336.0,Rwanda
+126,NI,1333.0,Nicaragua
+127,KW,1332.0,Kuwait
+128,MR,1329.0,Mauritania
+129,AZ,1322.0,Azerbaijan
+130,ZN,1320.0,Zanzibar
+131,CY,1314.0,Cyprus
+132,TZ,1313.0,Tanzania
+133,MQ,1312.0,Martinique
+134,LR,1304.0,Liberia
+135,,1303.0,
+136,KG,1295.0,Kyrgyzstan
+137,MY,1293.0,Malaysia
+137,GY,1293.0,Guyana
+139,LB,1288.0,Lebanon
+139,LV,1288.0,Latvia
+141,ET,1287.0,Ethiopia
+142,NC,1286.0,N Caledonia
+143,BI,1285.0,Burundi
+144,TJ,1284.0,Tajikistan
+145,DO,1283.0,Dominican R
+146,LT,1279.0,Lithuania
+147,MD,1270.0,Moldova
+148,BW,1267.0,Botswana
+149,MT,1255.0,Malta
+150,GW,1248.0,Guinea-Biss
+151,CU,1239.0,Cuba
+151,MW,1239.0,Malawi
+153,CF,1236.0,C Afr Rep
+154,GF,1223.0,Fr Guiana
+155,YT,1216.0,Mayotte
+156,TM,1209.0,Turkmenistan
+157,CG,1207.0,Congo
+158,ER,1201.0,Eritrea
+159,LS,1198.0,Lesotho
+160,YE,1195.0,Yemen
+161,PH,1179.0,Philippines
+162,TI,1177.0,Tahiti
+163,SW,1148.0,Eswatini
+164,VC,1141.0,St Vincent/G
+165,PG,1135.0,Papua N G
+165,PR,1135.0,Puerto Rico
+167,SG,1134.0,Singapore
+168,IN,1128.0,India
+169,BM,1117.0,Bermuda
+169,VU,1117.0,Vanuatu
+171,SS,1109.0,South Sudan
+172,FJ,1104.0,Fiji
+173,HK,1101.0,Hong Kong
+174,GD,1098.0,Grenada
+175,AD,1080.0,Andorra
+176,MU,1073.0,Mauritius
+176,TD,1073.0,Chad
+176,BZ,1073.0,Belize
+179,SB,1054.0,Solomon Isl
+180,MF,1043.0,Saint Martin
+181,ST,1035.0,Sao Tome/Pr
+182,KN,1030.0,St Kitts/N
+183,GI,1011.0,Gibraltar
+184,JS,1005.0,Somaliland
+185,LC,1003.0,Saint Lucia
+186,EH,996.0,W Sahara
+187,MM,984.0,Myanmar
+188,AW,979.0,Aruba
+188,SO,979.0,Somalia
+190,SX,974.0,Sint Maarten
+191,MS,972.0,Montserrat
+192,AF,961.0,Afghanistan
+193,GL,945.0,Greenland
+194,BD,942.0,Bangladesh
+195,DJ,940.0,Djibouti
+196,DM,935.0,Dominica
+197,PK,909.0,Pakistan
+198,MC,903.0,Monaco
+199,BB,898.0,Barbados
+200,AG,895.0,Antigua/Barb
+200,LI,895.0,Liechtenstein
+202,NP,893.0,Nepal
+203,KH,871.0,Cambodia
+204,SC,853.0,Seychelles
+205,LK,836.0,Sri Lanka
+206,SM,825.0,San Marino
+207,TW,822.0,Taiwan
+208,BQ,817.0,Bonaire
+209,MV,801.0,Maldives
+210,KY,800.0,Cayman Isl
+211,HG,782.0,Chagos Isl
+212,TV,756.0,Tuvalu
+213,VG,743.0,Br Virgin I
+214,EU,737.0,St Eustatius
+215,LA,734.0,Laos
+215,TL,734.0,East Timor
+217,WS,728.0,Samoa
+218,MN,726.0,Mongolia
+219,BL,725.0,St Barts
+220,GU,706.0,Guam
+221,WF,699.0,Wallis/Futuna
+222,VA,692.0,Vatican
+223,AB,691.0,Saba
+224,BS,685.0,Bahamas
+225,PM,677.0,St Pierre/M
+226,TC,657.0,Turks/Caicos
+227,AI,647.0,Anguilla
+228,TE,630.0,Tibet
+229,VI,628.0,US Virgin Isl
+230,BT,623.0,Bhutan
+231,CK,622.0,Cook Islands
+232,MO,589.0,Macao
+233,CX,578.0,Christmas I
+234,BN,572.0,Brunei
+235,FK,571.0,Falkland Isl
+236,FM,564.0,FSM
+237,MH,559.0,Marshall I
+238,KI,544.0,Kiribati
+239,TO,520.0,Tonga
+240,NU,496.0,Niue
+241,MP,432.0,N Marianas
+242,CC,422.0,Cocos Isl
+243,PW,402.0,Palau
+244,AS,369.0,East Samoa

@@ -76,6 +76,7 @@ class HealthResponse(BaseModel):
 class FinalFourTeam(BaseModel):
     team_id: str
     elo: float
+    squad_index: float = 0.0
     p_final: float
     p_champion: float
     se_champion: float
