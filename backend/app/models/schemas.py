@@ -43,17 +43,65 @@ class TeamOdds(BaseModel):
     p_semifinal: float
     p_quarterfinal: float
     p_r16: float
+    p_r32: float = 0.0
     p_group_exit: float
     se_champion: float
 
 
 class SimulationResponse(BaseModel):
+    competition: str
     format_key: str
+    label: str
     n_sims: int
     rng_seed: int | None
     teams: list[TeamOdds]
 
 
+class CompetitionInfo(BaseModel):
+    id: str
+    label: str
+    format_key: str
+    n_teams: int
+
+
+class CompetitionsResponse(BaseModel):
+    competitions: list[CompetitionInfo]
+
+
 class HealthResponse(BaseModel):
     status: str
     app: str
+
+
+class FinalFourTeam(BaseModel):
+    team_id: str
+    elo: float
+    p_final: float
+    p_champion: float
+    se_champion: float
+
+
+class SemifinalPreview(BaseModel):
+    home: str
+    away: str
+    date: str
+    home_elo: float
+    away_elo: float
+    p_home_regulation: float
+    p_draw_regulation: float
+    p_away_regulation: float
+    p_home_advance: float
+    p_away_advance: float
+    lambda_home: float
+    lambda_away: float
+
+
+class FinalFourResponse(BaseModel):
+    edition: str
+    label: str
+    as_of: str
+    n_sims: int
+    rng_seed: int | None
+    semifinals: list[SemifinalPreview]
+    teams: list[FinalFourTeam]
+    notes: str

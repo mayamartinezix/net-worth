@@ -118,6 +118,7 @@ CREATE TABLE simulation_results (
     team_id             UUID NOT NULL REFERENCES teams(id),
     -- Round-reached probabilities (0–1). Null stages unused by format are left NULL.
     p_group_exit        DOUBLE PRECISION,
+    p_r32               DOUBLE PRECISION,
     p_r16               DOUBLE PRECISION,
     p_quarterfinal      DOUBLE PRECISION,
     p_semifinal         DOUBLE PRECISION,

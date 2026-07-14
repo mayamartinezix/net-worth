@@ -1,0 +1,41 @@
+{
+  "key": "world_cup_48",
+  "competition": "world_cup",
+  "edition": 2026,
+  "description": "FIFA World Cup 2026 format (48 teams, 12 groups of 4, top 2 + 8 best thirds → Round of 32)",
+  "n_teams": 48,
+  "group_stage": {
+    "n_groups": 12,
+    "teams_per_group": 4,
+    "qualify_per_group": 2,
+    "best_thirds_advance": 8,
+    "points": {"win": 3, "draw": 1, "loss": 0},
+    "tiebreakers": [
+      "points",
+      "goal_difference",
+      "goals_for",
+      "head_to_head_points",
+      "head_to_head_goal_difference",
+      "head_to_head_goals_for",
+      "fair_play",
+      "drawing_of_lots"
+    ]
+  },
+  "knockout": {
+    "stages": ["round_of_32", "round_of_16", "quarterfinal", "semifinal", "final"],
+    "third_place_playoff": true,
+    "extra_time": true,
+    "penalties_if_drawn": true,
+    "bracket_seeding": "wc48_approx"
+  },
+  "penalty_model": {
+    "type": "coin_flip",
+    "notes": "Same rationale as prior editions; see model validation memo."
+  },
+  "design_decisions": {
+    "penalty_shootout": "coin_flip",
+    "neutral_venue_default": true,
+    "confederation_adjustment_default": false,
+    "best_thirds": "rank third-place teams by points → GD → GF; advance top 8 into Round of 32"
+  }
+}
