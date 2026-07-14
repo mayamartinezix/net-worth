@@ -9,10 +9,10 @@ __pycache__/
 dist/
 build/
 
-# Env / IDE
-.env
-.idea/
-.vscode/
+# Data
+data/raw/goalscorers.csv
+data/odds/WorldCup2026.xlsx
+
 
 # Node
 frontend/node_modules/

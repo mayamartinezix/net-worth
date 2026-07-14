@@ -1,0 +1,52 @@
+match_date,home_team_id,away_team_id,home_goals,away_goals,tournament,city,country,is_neutral_venue,is_friendly
+2016-06-10,France,Romania,2,1,UEFA Euro,Saint-Denis,France,False,False
+2016-06-11,Wales,Slovakia,2,1,UEFA Euro,Bordeaux,France,True,False
+2016-06-11,England,Russia,1,1,UEFA Euro,Marseille,France,True,False
+2016-06-11,Albania,Switzerland,0,1,UEFA Euro,Lens,France,True,False
+2016-06-12,Germany,Ukraine,2,0,UEFA Euro,Villeneuve-d'Ascq,France,True,False
+2016-06-12,Poland,Northern Ireland,1,0,UEFA Euro,Nice,France,True,False
+2016-06-12,Turkey,Croatia,0,1,UEFA Euro,Paris,France,True,False
+2016-06-13,Spain,Czech Republic,1,0,UEFA Euro,Toulouse,France,True,False
+2016-06-13,Republic of Ireland,Sweden,1,1,UEFA Euro,Saint-Denis,France,True,False
+2016-06-13,Belgium,Italy,0,2,UEFA Euro,Lyon,France,True,False
+2016-06-14,Austria,Hungary,0,2,UEFA Euro,Bordeaux,France,True,False
+2016-06-14,Portugal,Iceland,1,1,UEFA Euro,Saint-Étienne,France,True,False
+2016-06-15,Russia,Slovakia,1,2,UEFA Euro,Villeneuve-d'Ascq,France,True,False
+2016-06-15,France,Albania,2,0,UEFA Euro,Marseille,France,False,False
+2016-06-15,Romania,Switzerland,1,1,UEFA Euro,Paris,France,True,False
+2016-06-16,England,Wales,2,1,UEFA Euro,Lens,France,True,False
+2016-06-16,Germany,Poland,0,0,UEFA Euro,Saint-Denis,France,True,False
+2016-06-16,Ukraine,Northern Ireland,0,2,UEFA Euro,Lyon,France,True,False
+2016-06-17,Spain,Turkey,3,0,UEFA Euro,Nice,France,True,False
+2016-06-17,Czech Republic,Croatia,2,2,UEFA Euro,Saint-Étienne,France,True,False
+2016-06-17,Italy,Sweden,1,0,UEFA Euro,Toulouse,France,True,False
+2016-06-18,Belgium,Republic of Ireland,3,0,UEFA Euro,Bordeaux,France,True,False
+2016-06-18,Iceland,Hungary,1,1,UEFA Euro,Marseille,France,True,False
+2016-06-18,Portugal,Austria,0,0,UEFA Euro,Lyon,France,True,False
+2016-06-19,Romania,Albania,0,1,UEFA Euro,Lyon,France,True,False
+2016-06-19,France,Switzerland,0,0,UEFA Euro,Villeneuve-d'Ascq,France,False,False
+2016-06-20,Russia,Wales,0,3,UEFA Euro,Toulouse,France,True,False
+2016-06-20,Slovakia,England,0,0,UEFA Euro,Saint-Étienne,France,True,False
+2016-06-21,Croatia,Spain,2,1,UEFA Euro,Bordeaux,France,True,False
+2016-06-21,Czech Republic,Turkey,0,2,UEFA Euro,Lens,France,True,False
+2016-06-21,Northern Ireland,Germany,0,1,UEFA Euro,Paris,France,True,False
+2016-06-21,Ukraine,Poland,0,1,UEFA Euro,Marseille,France,True,False
+2016-06-22,Sweden,Belgium,0,1,UEFA Euro,Nice,France,True,False
+2016-06-22,Italy,Republic of Ireland,0,1,UEFA Euro,Villeneuve-d'Ascq,France,True,False
+2016-06-22,Hungary,Portugal,3,3,UEFA Euro,Lyon,France,True,False
+2016-06-22,Iceland,Austria,2,1,UEFA Euro,Saint-Denis,France,True,False
+2016-06-25,Switzerland,Poland,1,1,UEFA Euro,Saint-Étienne,France,True,False
+2016-06-25,Wales,Northern Ireland,1,0,UEFA Euro,Paris,France,True,False
+2016-06-25,Croatia,Portugal,0,1,UEFA Euro,Lens,France,True,False
+2016-06-26,Hungary,Belgium,0,4,UEFA Euro,Toulouse,France,True,False
+2016-06-26,Germany,Slovakia,3,0,UEFA Euro,Villeneuve-d'Ascq,France,True,False
+2016-06-26,France,Republic of Ireland,2,1,UEFA Euro,Lyon,France,False,False
+2016-06-27,England,Iceland,1,2,UEFA Euro,Nice,France,True,False
+2016-06-27,Italy,Spain,2,0,UEFA Euro,Saint-Denis,France,True,False
+2016-06-30,Poland,Portugal,1,1,UEFA Euro,Marseille,France,True,False
+2016-07-01,Wales,Belgium,3,1,UEFA Euro,Villeneuve-d'Ascq,France,True,False
+2016-07-02,Germany,Italy,1,1,UEFA Euro,Bordeaux,France,True,False
+2016-07-03,France,Iceland,5,2,UEFA Euro,Saint-Denis,France,False,False
+2016-07-06,Portugal,Wales,2,0,UEFA Euro,Lyon,France,True,False
+2016-07-07,France,Germany,2,0,UEFA Euro,Marseille,France,False,False
+2016-07-10,France,Portugal,0,1,UEFA Euro,Saint-Denis,France,False,False

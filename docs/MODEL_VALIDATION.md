@@ -50,12 +50,15 @@ Group-stage path dependence, best-third ranking (Euros), and tiebreakers make cl
 
 ## 4. Data sources and known limitations
 
-| Source | Use | Caveat |
-|--------|-----|--------|
-| Historical international results | Elo fit + Poisson calibration | Friendly match motivation varies; down-weighted K |
-| Tournament brackets / configs | Simulator structure | Format changes (e.g., WC 2026 → 48 teams) require new JSON config |
-| Betting-market odds (when available) | External benchmark | Closing odds embed sharp information we do not claim to beat |
-| FIFA rankings | Naive baseline only | Slow-moving; weaker short-horizon signal than Elo |
+| Source | Use | Location | Caveat |
+|--------|-----|----------|--------|
+| Historical international results | Elo fit + Poisson calibration | `data/raw/results.csv` → `data/processed/` | Friendly motivation varies; down-weighted K |
+| Tournament editions (WC/Euros) | Backtest windows | `data/processed/matches_{wc,euro}_*.csv` | Euro 2020 staged in 2021 |
+| FIFA rankings | Naive baseline | `data/processed/fifa_rankings.csv` | Slow-moving vs Elo |
+| Betting-market odds (WC) | External benchmark | `data/odds/wc_2018_odds.csv`, `wc_2022_odds.csv` | Avg decimal odds; overround removed in ingest |
+| Betting-market odds (Euros) | External benchmark | **Drop into** `data/odds/euro_*_odds.csv` | Not in the free WC workbook — optional |
+
+Refresh instructions: [DATA.md](DATA.md).
 
 **Sample-size caveat:** A World Cup has 64 matches; one tournament is not a large IID sample. Backtests must pool across multiple editions and treat calibration bins carefully.
 
