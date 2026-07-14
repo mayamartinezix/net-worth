@@ -1,0 +1,40 @@
+{
+  "key": "euros_24",
+  "competition": "euros",
+  "description": "UEFA Euro format 2016–2024 (24 teams, 6 groups of 4, 4 best third-place)",
+  "n_teams": 24,
+  "group_stage": {
+    "n_groups": 6,
+    "teams_per_group": 4,
+    "qualify_per_group": 2,
+    "best_thirds_advance": 4,
+    "points": {"win": 3, "draw": 1, "loss": 0},
+    "tiebreakers": [
+      "points",
+      "goal_difference",
+      "goals_for",
+      "head_to_head_points",
+      "head_to_head_goal_difference",
+      "head_to_head_goals_for",
+      "fair_play",
+      "drawing_of_lots"
+    ]
+  },
+  "knockout": {
+    "stages": ["round_of_16", "quarterfinal", "semifinal", "final"],
+    "third_place_playoff": false,
+    "extra_time": true,
+    "penalties_if_drawn": true,
+    "bracket_seeding": "uefa_euros_24"
+  },
+  "penalty_model": {
+    "type": "coin_flip",
+    "notes": "Same rationale as World Cup; see model validation memo."
+  },
+  "design_decisions": {
+    "penalty_shootout": "coin_flip",
+    "neutral_venue_default": true,
+    "confederation_adjustment_default": false,
+    "best_thirds": "rank all third-place teams by points → GD → GF, advance top 4; bracket pairing uses UEFA fixed third-place combo table"
+  }
+}

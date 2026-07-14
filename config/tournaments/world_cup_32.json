@@ -1,0 +1,38 @@
+{
+  "key": "world_cup_32",
+  "competition": "world_cup",
+  "description": "FIFA World Cup format used 1998–2022 (32 teams, 8 groups of 4)",
+  "n_teams": 32,
+  "group_stage": {
+    "n_groups": 8,
+    "teams_per_group": 4,
+    "qualify_per_group": 2,
+    "points": {"win": 3, "draw": 1, "loss": 0},
+    "tiebreakers": [
+      "points",
+      "goal_difference",
+      "goals_for",
+      "head_to_head_points",
+      "head_to_head_goal_difference",
+      "head_to_head_goals_for",
+      "fair_play",
+      "drawing_of_lots"
+    ]
+  },
+  "knockout": {
+    "stages": ["round_of_16", "quarterfinal", "semifinal", "final"],
+    "third_place_playoff": true,
+    "extra_time": true,
+    "penalties_if_drawn": true,
+    "bracket_seeding": "standard_wc32"
+  },
+  "penalty_model": {
+    "type": "coin_flip",
+    "notes": "Empirical knockout shootouts are near 50/50 after conditioning on reaching ET; documented in validation memo."
+  },
+  "design_decisions": {
+    "penalty_shootout": "coin_flip — model strength predicts regulation goals well; shootout outcomes add little skill signal at national-team sample sizes",
+    "neutral_venue_default": true,
+    "confederation_adjustment_default": false
+  }
+}

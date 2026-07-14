@@ -1,0 +1,35 @@
+[
+  {
+    "n": 1000,
+    "favorite": "BRA",
+    "p_favorite": 0.331,
+    "se_favorite": 0.014880826589944525,
+    "longshot": "CRO",
+    "p_longshot": 0.0,
+    "se_longshot": 0.0,
+    "theory_se_favorite": 0.014880826589944525,
+    "theory_se_longshot": 0.0
+  },
+  {
+    "n": 5000,
+    "favorite": "BRA",
+    "p_favorite": 0.2938,
+    "se_favorite": 0.006441763112688947,
+    "longshot": "CRO",
+    "p_longshot": 0.0004,
+    "se_longshot": 0.00028278613827413816,
+    "theory_se_favorite": 0.006441763112688947,
+    "theory_se_longshot": 0.00028278613827413816
+  },
+  {
+    "n": 10000,
+    "favorite": "BRA",
+    "p_favorite": 0.312,
+    "se_favorite": 0.004633098315382483,
+    "longshot": "CRO",
+    "p_longshot": 0.0001,
+    "se_longshot": 9.999499987499375e-05,
+    "theory_se_favorite": 0.004633098315382483,
+    "theory_se_longshot": 9.999499987499375e-05
+  }
+]
