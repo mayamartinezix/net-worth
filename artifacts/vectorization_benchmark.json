@@ -1,0 +1,10 @@
+{
+  "n": 50000,
+  "lambda_home": 3.572063897578954,
+  "lambda_away": 0.43742218638894426,
+  "seconds_naive_loop": 0.049520866999955615,
+  "seconds_vectorized_choice": 0.0027209590002712503,
+  "seconds_model_helper": 0.0028948560002390877,
+  "speedup_vs_naive": 18.199784338910995,
+  "notes": "Naive baseline draws Poisson margins in a Python for-loop. Vectorized path builds the scoreline PMF once and samples with numpy choice. This is the analog of vectorizing risk-factor shocks in a VaR engine."
+}

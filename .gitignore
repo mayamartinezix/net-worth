@@ -1,0 +1,32 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# Env / IDE
+.env
+.idea/
+.vscode/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Artifacts: ignore bulky regenerable dumps but keep portfolio plots/json
+artifacts/elo_snapshot*.csv
+artifacts/*.png
+artifacts/*.json
+!artifacts/.gitkeep
+!artifacts/convergence_results.json
+!artifacts/convergence_plot.png
+!artifacts/vectorization_benchmark.json
+!artifacts/convergence_cv.json
+
+# OS
+.DS_Store
