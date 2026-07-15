@@ -94,6 +94,19 @@ Writes to `artifacts/`.
 cd frontend && npm install && npm run dev
 ```
 
+### Staging (team round odds)
+
+Pick one or two teams and query QF / SF / Final probabilities:
+
+```bash
+chmod +x scripts/dev-staging.sh
+./scripts/dev-staging.sh
+```
+
+- Staging UI: `http://localhost:5173/staging.html` (Vite dev)
+- Production build: `cd frontend && npm run build` then `http://localhost:8000/staging`
+- API: `GET /api/v1/odds/teams?team=France&team=Spain&competition=world_cup_2026`
+
 ### Database
 
 ```bash

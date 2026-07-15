@@ -204,6 +204,8 @@ export default function App() {
       </section>
 
       <footer className="footer">
+        <a href="/staging">Team odds (staging)</a>
+        <span>·</span>
         <a href="/docs" target="_blank" rel="noreferrer">
           API
         </a>

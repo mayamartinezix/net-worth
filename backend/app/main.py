@@ -43,6 +43,13 @@ def create_app() -> FastAPI:
         def app_index() -> FileResponse:
             return FileResponse(FRONTEND_DIST / "index.html")
 
+        @app.get("/staging")
+        def staging() -> FileResponse:
+            path = FRONTEND_DIST / "staging.html"
+            if not path.exists():
+                raise HTTPException(status_code=404, detail="Staging build not found")
+            return FileResponse(path)
+
         @app.get("/favicon.ico")
         def favicon() -> None:
             raise HTTPException(status_code=404)

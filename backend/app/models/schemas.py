@@ -106,3 +106,32 @@ class FinalFourResponse(BaseModel):
     semifinals: list[SemifinalPreview]
     teams: list[FinalFourTeam]
     notes: str
+
+
+class FieldTeamsResponse(BaseModel):
+    competition: str
+    label: str
+    teams: list[str]
+
+
+class TeamRoundOdds(BaseModel):
+    team_id: str
+    p_quarterfinal: float
+    p_semifinal: float
+    p_final: float
+    p_champion: float
+
+
+class JointRoundOdds(BaseModel):
+    p_both_quarterfinal: float
+    p_both_semifinal: float
+    p_both_final: float
+
+
+class TeamRoundOddsResponse(BaseModel):
+    competition: str
+    label: str
+    n_sims: int
+    rng_seed: int | None
+    teams: list[TeamRoundOdds]
+    joint: JointRoundOdds | None = None

@@ -85,6 +85,9 @@ class SimulationAggregate:
     p_group_exit: dict[str, float]
     se_champion: dict[str, float] = field(default_factory=dict)
     p_r32: dict[str, float] = field(default_factory=dict)
+    joint_both_quarterfinal: float | None = None
+    joint_both_semifinal: float | None = None
+    joint_both_final: float | None = None
 
     def to_records(self) -> list[dict[str, Any]]:
         rows = []
@@ -329,9 +332,15 @@ class TournamentSimulator:
         self,
         groups: dict[str, list[TeamState]],
         n_sims: int = 10_000,
+        watch: list[str] | None = None,
     ) -> SimulationAggregate:
         all_teams = [t for g in groups.values() for t in g]
         team_ids = [t.team_id for t in all_teams]
+        watch_set = set(watch or [])
+        if watch_set:
+            unknown = watch_set - set(team_ids)
+            if unknown:
+                raise ValueError(f"Unknown teams in watch list: {sorted(unknown)}")
 
         counts = {
             "champion": defaultdict(int),
@@ -342,6 +351,11 @@ class TournamentSimulator:
             "r32": defaultdict(int),
             "group_exit": defaultdict(int),
         }
+        joint_counts = (
+            {"quarterfinal": 0, "semifinal": 0, "final": 0}
+            if len(watch_set) >= 2
+            else None
+        )
 
         for _ in range(n_sims):
             qualified, eliminated, _ = self.simulate_group_stage(groups)
@@ -362,6 +376,11 @@ class TournamentSimulator:
             for tid in reached["champion"]:
                 counts["champion"][tid] += 1
 
+            if joint_counts is not None:
+                for stage in ("quarterfinal", "semifinal", "final"):
+                    if watch_set <= reached.get(stage, set()):
+                        joint_counts[stage] += 1
+
         def probs(counter: dict[str, int]) -> dict[str, float]:
             return {tid: counter.get(tid, 0) / n_sims for tid in team_ids}
 
@@ -381,6 +400,13 @@ class TournamentSimulator:
             p_group_exit=probs(counts["group_exit"]),
             se_champion=se,
             p_r32=probs(counts["r32"]),
+            joint_both_quarterfinal=(
+                joint_counts["quarterfinal"] / n_sims if joint_counts else None
+            ),
+            joint_both_semifinal=(
+                joint_counts["semifinal"] / n_sims if joint_counts else None
+            ),
+            joint_both_final=(joint_counts["final"] / n_sims if joint_counts else None),
         )
 
 

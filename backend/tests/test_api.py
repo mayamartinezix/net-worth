@@ -77,3 +77,52 @@ def test_final_four_wc2026():
     assert abs(sum(t["p_final"] for t in body["teams"]) - 2.0) < 1e-6
     for s in body["semifinals"]:
         assert abs(s["p_home_advance"] + s["p_away_advance"] - 1.0) < 1e-6
+
+
+def test_list_field_teams():
+    r = client.get("/api/v1/competitions/world_cup_2026/teams")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["competition"] == "world_cup_2026"
+    assert len(body["teams"]) == 48
+    assert "France" in body["teams"]
+
+
+def test_team_round_odds_single():
+    r = client.get(
+        "/api/v1/odds/teams",
+        params={"team": "France", "competition": "euros_2024", "n_sims": 80, "seed": 5},
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert len(body["teams"]) == 1
+    assert body["teams"][0]["team_id"] == "France"
+    assert body["joint"] is None
+    t = body["teams"][0]
+    assert t["p_final"] <= t["p_semifinal"] <= t["p_quarterfinal"] + 1e-9
+
+
+def test_team_round_odds_pair():
+    r = client.get(
+        "/api/v1/odds/teams",
+        params={
+            "team": ["France", "Spain"],
+            "competition": "world_cup_2026",
+            "n_sims": 60,
+            "seed": 9,
+        },
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert len(body["teams"]) == 2
+    assert body["joint"] is not None
+    j = body["joint"]
+    assert j["p_both_final"] <= j["p_both_semifinal"] <= j["p_both_quarterfinal"] + 1e-9
+
+
+def test_team_round_odds_unknown():
+    r = client.get(
+        "/api/v1/odds/teams",
+        params={"team": "Atlantis", "competition": "euros_2024", "n_sims": 50},
+    )
+    assert r.status_code == 400
