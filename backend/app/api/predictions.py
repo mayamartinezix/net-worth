@@ -12,14 +12,18 @@ from fastapi import APIRouter, HTTPException, Query
 from app.models.schemas import (
     CompetitionInfo,
     CompetitionsResponse,
+    FieldTeamsResponse,
     FinalFourResponse,
     FinalFourTeam,
+    JointRoundOdds,
     MatchPredictRequest,
     MatchPredictionResponse,
     ScorelineProb,
     SemifinalPreview,
     SimulationResponse,
     TeamOdds,
+    TeamRoundOdds,
+    TeamRoundOddsResponse,
 )
 from app.services.final_four import compare_final_four
 from app.services.poisson_model import PoissonMatchModel, PoissonModelConfig
@@ -42,6 +46,29 @@ COMPETITIONS = {
         "builder": build_euro2024_groups,
     },
 }
+
+
+def _resolve_competition(competition: str) -> tuple[str, str, str, dict]:
+    if competition == "world_cup_32_legacy":
+        return (
+            "world_cup_32_legacy",
+            "world_cup_32",
+            "World Cup 32 (legacy demo)",
+            build_demo_world_cup_groups(),
+        )
+    if competition in COMPETITIONS:
+        meta = COMPETITIONS[competition]
+        return (
+            competition,
+            meta["format_key"],
+            meta["label"],
+            meta["builder"](),
+        )
+    raise HTTPException(
+        status_code=400,
+        detail=f"Unknown competition '{competition}'. "
+        f"Use one of: {', '.join([*COMPETITIONS, 'world_cup_32_legacy'])}",
+    )
 
 
 @router.get("/competitions", response_model=CompetitionsResponse)
@@ -99,21 +126,7 @@ def simulate_demo(
     n_sims: int = Query(250, ge=10, le=5_000),
     seed: int = Query(42),
 ) -> SimulationResponse:
-    if competition == "world_cup_32_legacy":
-        format_key = "world_cup_32"
-        label = "World Cup 32 (legacy demo)"
-        groups = build_demo_world_cup_groups()
-    elif competition in COMPETITIONS:
-        meta = COMPETITIONS[competition]
-        format_key = meta["format_key"]
-        label = meta["label"]
-        groups = meta["builder"]()
-    else:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Unknown competition '{competition}'. "
-            f"Use one of: {', '.join([*COMPETITIONS, 'world_cup_32_legacy'])}",
-        )
+    competition, format_key, label, groups = _resolve_competition(competition)
 
     sim = TournamentSimulator(format_key=format_key, rng_seed=seed)
     result = sim.run(groups, n_sims=n_sims)
@@ -138,6 +151,76 @@ def simulate_demo(
         n_sims=n_sims,
         rng_seed=seed,
         teams=teams,
+    )
+
+
+@router.get("/competitions/{competition_id}/teams", response_model=FieldTeamsResponse)
+def list_field_teams(competition_id: str) -> FieldTeamsResponse:
+    competition, _format_key, label, groups = _resolve_competition(competition_id)
+    teams = sorted({t.team_id for group in groups.values() for t in group})
+    return FieldTeamsResponse(competition=competition, label=label, teams=teams)
+
+
+@router.get("/odds/teams", response_model=TeamRoundOddsResponse)
+def team_round_odds(
+    team: list[str] = Query(
+        ...,
+        min_length=1,
+        max_length=2,
+        description="One or two team names from the competition field",
+    ),
+    competition: str = Query(
+        "world_cup_2026",
+        description="world_cup_2026 | euros_2024 | world_cup_32_legacy",
+    ),
+    n_sims: int = Query(1_000, ge=50, le=10_000),
+    seed: int = Query(42),
+) -> TeamRoundOddsResponse:
+    """Round-reach probabilities for one or two selected teams."""
+    selected = list(dict.fromkeys(team))  # preserve order, drop dupes
+    if len(selected) > 2:
+        raise HTTPException(status_code=400, detail="Select at most two teams.")
+
+    competition, format_key, label, groups = _resolve_competition(competition)
+    field_teams = {t.team_id for group in groups.values() for t in group}
+    unknown = [t for t in selected if t not in field_teams]
+    if unknown:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unknown team(s) for {competition}: {unknown}",
+        )
+
+    sim = TournamentSimulator(format_key=format_key, rng_seed=seed)
+    try:
+        result = sim.run(groups, n_sims=n_sims, watch=selected)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    teams_out = [
+        TeamRoundOdds(
+            team_id=tid,
+            p_quarterfinal=result.p_quarterfinal[tid],
+            p_semifinal=result.p_semifinal[tid],
+            p_final=result.p_final[tid],
+            p_champion=result.p_champion[tid],
+        )
+        for tid in selected
+    ]
+    joint = None
+    if len(selected) == 2 and result.joint_both_quarterfinal is not None:
+        joint = JointRoundOdds(
+            p_both_quarterfinal=result.joint_both_quarterfinal,
+            p_both_semifinal=result.joint_both_semifinal or 0.0,
+            p_both_final=result.joint_both_final or 0.0,
+        )
+
+    return TeamRoundOddsResponse(
+        competition=competition,
+        label=label,
+        n_sims=n_sims,
+        rng_seed=seed,
+        teams=teams_out,
+        joint=joint,
     )
 
 
